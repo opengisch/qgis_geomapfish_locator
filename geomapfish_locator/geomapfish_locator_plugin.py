@@ -22,7 +22,7 @@
 """
 
 from qgis.core import QgsApplication
-from .gmf_locator_filter import gmfLocatorFilter
+from .geomapfish_locator_filter import GeomapfishLocatorFilter
 
 
 class GeomapfishLocatorPlugin:

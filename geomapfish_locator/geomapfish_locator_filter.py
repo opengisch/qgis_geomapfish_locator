@@ -23,12 +23,15 @@
 
 
 import json
-from PyQt5.QtCore import pyqtSignal, QUrl, QEventLoop
+from PyQt5.QtCore import pyqtSignal, QUrl, QUrlQuery, QByteArray, QEventLoop
 from PyQt5.QtNetwork import QNetworkRequest, QNetworkReply
 from qgis.core import Qgis, QgsMessageLog, QgsLocatorFilter, QgsLocatorResult, QgsRectangle, \
-    QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, QgsNetworkAccessManager
+    QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, QgsNetworkAccessManager, QgsGeometry
+from osgeo import ogr
 
-from .network_access_manager import NetworkAccessManager, RequestsException
+from .network_access_manager import NetworkAccessManager, RequestsException, RequestsExceptionUserAbort
+
+from .settings import Settings
 
 
 class GeomapfishLocatorFilter(QgsLocatorFilter):
@@ -49,6 +52,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
     def __init__(self, iface):
         self.iface = iface
         self.reply = None
+        self.settings = Settings()
         super().__init__()
 
     def name(self):
@@ -58,43 +62,95 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         return GeomapfishLocatorFilter(self.iface)
 
     def displayName(self):
-        return self.tr('Geomapfish Geoadmin locations')
+        name = self.settings.value("filter_name")
+        if name != '':
+            return name
+        return self.tr('Geomapfish service')
 
     def prefix(self):
-        return 'chx'
+        return 'gmf'
+
+    @staticmethod
+    def request(url, params, headers={}):
+        url = QUrl(url)
+        q = QUrlQuery(url)
+        for key, value in params.items():
+            q.addQueryItem(key, value)
+        url.setQuery(q)
+        request = QNetworkRequest(url)
+        for key, value in headers.items():
+            request.setRawHeader(key, value)
+        return request
 
     def fetchResults(self, search, context, feedback):
 
-        self.info("start GMF locator search")
+        self.feedback = feedback
+
+        self.info("start GMF locator search...")
 
         if len(search) < 2:
             return
 
         if self.reply is not None and self.reply.isRunning():
-            self.reply.close()
+            self.reply.abort()
 
-        url = 'https://api3.geo.admin.ch/rest/services/api/SearchServer?type={type}&searchText={search}'.format(
-            type='locations', search=search)
+        url = 'https://map.cartoriviera.ch/main/wsgi/fulltextsearch'
+        params = {
+            'query': search,
+            'limit': str(self.settings.value('total_limit')),
+            'partitionlimit': str(self.settings.value('category_limit'))
+        }
 
-        self.info('Search url {}'.format(url))
+        headers = {}
+        # headers = {b'User-Agent': self.USER_AGENT}
+        # if self.settings.value('geomapfish_user') != '':
+        #     user = self.settings.value('geomapfish_user')
+        #     password = self.settings.value('geomapfish_pass')
+        #     auth_data = "{}:{}".format(user, password)
+        #     b64 = QByteArray(auth_data.encode()).toBase64()
+        #     headers[QByteArray('Authorization'.encode())] = QByteArray('Basic '.encode()) + b64
 
-        nam = QgsNetworkAccessManager().instance()
-        self.reply = nam.get(QNetworkRequest(QUrl(url)))
-        self.reply.finished.connect(self.handleResponse)
+        r = self.request(url, params, headers)
+        self.info(r.url())
 
-    def handleResponse(self):
-        if self.reply.error() != QNetworkReply.NoError:
-            self.info("Error occurred: {}".format(self.reply.error()))
-            self.info(self.reply.error().errorString())
+        nam = NetworkAccessManager()
+        self.feedback.canceled.connect(nam.abort)
+        try:
+            (response, content) = nam.request(r.url().toString(), headers=headers, blocking=True)
+            self.handle_response(response, content)
+        except RequestsExceptionUserAbort:
+            pass
+        except RequestsException as err:
+            self.info(err)
+
+    def handle_response(self, response, content):
+        if response.status_code != 200:
+            self.info("Error with status code: {}".format(response.status_code))
             return
 
-        content = str(self.reply.readAll(), 'utf-8')
-        locations = json.loads(content)
-        self.info(content)
-        for loc in locations['results']:
-            for k,v in loc['attrs'].items():
-                self.info("{}: {}{}".format(k,v))
-            break
+        data = json.loads(content.decode('utf-8'))
+        self.info(data)
+
+        srv_crs_authid = self.settings.value('geomapfish_crs')
+        srv_crs_authid = int(srv_crs_authid.replace('EPSG:', ''))
+        features = data['features']
+        for f in features:
+            json_geom = json.dumps(f['geometry'])
+            ogr_geom = ogr.CreateGeometryFromJson(json_geom)
+            wkt = ogr_geom.ExportToWkt()
+            geometry = QgsGeometry.fromWkt(wkt)
+            properties = f['properties']
+            self.info('{} {}'.format(properties['layer_name'], properties['label']))
+            if geometry is None:
+                continue
+
+            result = QgsLocatorResult()
+            result.filter = self
+            result.displayString = properties['label']
+            result.group = properties['layer_name']
+            self.resultFetched.emit(result)
+
+
 
         # try:
         #     # see https://operations.osmfoundation.org/policies/nominatim/

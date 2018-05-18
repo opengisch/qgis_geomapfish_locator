@@ -223,7 +223,7 @@ class NetworkAccessManager(object):
         # block if blocking mode otherwise return immediatly
         # it's up to the caller to manage listeners in case of no blocking mode
         if not self.blocking_mode:
-            return (None, None)
+            return None, None
 
         # Call and block
         self.el = QEventLoop()

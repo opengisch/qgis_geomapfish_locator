@@ -1,18 +1,18 @@
 
 [general]
-name=SwissLocator
+name=Geomapfish Locator
 qgisMinimumVersion=3.0
-description=A locator filter for Swiss Geoadmin
+description=A locator filter for Geomapfish services
 version=dev
 author=Denis Rouzaud
 email=denis@opengis.ch
 
 # Tags are comma separated with spaces allowed
-tags=swiss,suisse,schweiz locator, geoadmin
+tags=locator,geomapfish
 
-tracker=https://github.com/opengisch/qgis_swiss_locator
-homepage=https://github.com/opengisch/qgis_swiss_locator
-repository=https://github.com/opengisch/qgis_swiss_locator
+tracker=https://github.com/opengisch/qgis_geomapfish_locator
+homepage=https://github.com/opengisch/qgis_geomapfish_locator
+repository=https://github.com/opengisch/qgis_geomapfish_locator
 
 category=Web
 
@@ -20,4 +20,4 @@ category=Web
 experimental=False
 
 # change icon...
-icon=icons/swiss_locator.png
+icon=icons/geomapfish.png

@@ -1,0 +1,3 @@
+[submodule "geomapfish_locator/qgissettingmanager"]
+	path = geomapfish_locator/qgissettingmanager
+	url = git@github.com:3nids/qgissettingmanager.git
