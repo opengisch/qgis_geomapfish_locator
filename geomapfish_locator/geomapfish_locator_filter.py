@@ -23,15 +23,32 @@
 
 
 import json
-from PyQt5.QtCore import pyqtSignal, QUrl, QUrlQuery, QByteArray, QEventLoop
-from PyQt5.QtNetwork import QNetworkRequest, QNetworkReply
+import os
+
+from PyQt5.QtCore import pyqtSignal, QUrl, QUrlQuery, QByteArray
+from PyQt5.QtWidgets import QDialog
+from PyQt5.QtNetwork import QNetworkRequest
+from PyQt5.uic import loadUiType
+
 from qgis.core import Qgis, QgsMessageLog, QgsLocatorFilter, QgsLocatorResult, QgsRectangle, \
-    QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, QgsNetworkAccessManager, QgsGeometry
+    QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, QgsGeometry
 from osgeo import ogr
 
+from .qgissettingmanager.setting_dialog import SettingDialog
 from .network_access_manager import NetworkAccessManager, RequestsException, RequestsExceptionUserAbort
-
 from .settings import Settings
+
+
+DialogUi, _ = loadUiType(os.path.join(os.path.dirname(__file__), 'ui/config.ui'))
+
+
+class SettingsDialog(QDialog, DialogUi, SettingDialog):
+    def __init__(self):
+        settings = Settings()
+        super.__init__(self, settings)
+        self.setupUi(self)
+        self.settings = settings
+        self.init_widgets()
 
 
 class GeomapfishLocatorFilter(QgsLocatorFilter):
@@ -70,6 +87,12 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
     def prefix(self):
         return 'gmf'
 
+    def hasConfigWidget(self):
+        return True
+
+    def openConfigWidget(self, parent):
+        SettingDialog().exec_()
+
     @staticmethod
     def request(url, params, headers={}):
         url = QUrl(url)
@@ -102,13 +125,13 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         }
 
         headers = {}
-        # headers = {b'User-Agent': self.USER_AGENT}
-        # if self.settings.value('geomapfish_user') != '':
-        #     user = self.settings.value('geomapfish_user')
-        #     password = self.settings.value('geomapfish_pass')
-        #     auth_data = "{}:{}".format(user, password)
-        #     b64 = QByteArray(auth_data.encode()).toBase64()
-        #     headers[QByteArray('Authorization'.encode())] = QByteArray('Basic '.encode()) + b64
+        headers = {b'User-Agent': self.USER_AGENT}
+        if self.settings.value('geomapfish_user') != '':
+            user = self.settings.value('geomapfish_user')
+            password = self.settings.value('geomapfish_pass')
+            auth_data = "{}:{}".format(user, password)
+            b64 = QByteArray(auth_data.encode()).toBase64()
+            headers[QByteArray('Authorization'.encode())] = QByteArray('Basic '.encode()) + b64
 
         r = self.request(url, params, headers)
         self.info(r.url())

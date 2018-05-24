@@ -1,2 +1,2 @@
-# qgis_swiss_locator
-A Swiss Geoadmin locator for QGIS 3
+# Geomapfish Locator Plugin
+A QGIS 3 locator plugin for Geomapfish services
