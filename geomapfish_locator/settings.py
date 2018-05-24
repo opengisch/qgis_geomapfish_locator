@@ -1,7 +1,8 @@
+# -*- coding: utf-8 -*-
 # -----------------------------------------------------------
 #
-# QGIS Quick Finder Plugin
-# Copyright (C) 2014 Denis Rouzaud, Arnaud Morvan
+# QGIS Geomapfish Locator Plugin
+# Copyright (C) 2018 Denis Rouzaud
 #
 # -----------------------------------------------------------
 #
@@ -39,6 +40,7 @@ class Settings(SettingManager):
         self.add_setting(Integer("total_limit", Scope.Global, 80))
 
         # GeoMapFish settings
+        self.add_setting(Bool("remove_leading_digits", Scope.Global, True))
         self.add_setting(String("geomapfish_url", Scope.Global, 'http://mapfish-geoportal.demo-camptocamp.com/1.5/search'))
         self.add_setting(String("geomapfish_crs", Scope.Global, 'EPSG:3857'))
         self.add_setting(String("geomapfish_user", Scope.Global, ''))
