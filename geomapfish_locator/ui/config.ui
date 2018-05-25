@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>411</width>
-    <height>330</height>
+    <width>503</width>
+    <height>522</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -97,11 +97,62 @@
       <string>Advanced configuration</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="remove_leading_digits">
-        <property name="text">
-         <string>Remove leading digits in group titles</string>
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="category_limit">
+        <property name="minimum">
+         <number>1</number>
         </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Maximum results in total</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="total_limit">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Maximum results per category</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QgsCollapsibleGroupBox" name="mGroupBox_2">
+        <property name="title">
+         <string>Beautify category names</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="remove_leading_digits">
+           <property name="text">
+            <string>Remove leading digits in group titles</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="replace_underscore">
+           <property name="text">
+            <string>Replace underscore by spaces</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="break_camelcase">
+           <property name="text">
+            <string>Break CamelCase</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>

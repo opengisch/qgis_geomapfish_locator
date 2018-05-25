@@ -32,16 +32,21 @@ pluginName = "geomapfsih_locator_plugin"
 class Settings(SettingManager):
     def __init__(self):
         SettingManager.__init__(self, pluginName)
+
+        # change filter name
         self.add_setting(String("filter_name", Scope.Global, ''))
 
-        # general settings
-        self.add_setting(Integer("history_length", Scope.Global, 3))
-        self.add_setting(Integer("category_limit", Scope.Global, 10))
-        self.add_setting(Integer("total_limit", Scope.Global, 80))
-
-        # GeoMapFish settings
+        # beautify group names
         self.add_setting(Bool("remove_leading_digits", Scope.Global, True))
+        self.add_setting(Bool("replace_underscore", Scope.Global, True))
+        self.add_setting(Bool("break_camelcase", Scope.Global, True))
+
+        # connection settings
         self.add_setting(String("geomapfish_url", Scope.Global, 'http://mapfish-geoportal.demo-camptocamp.com/1.5/search'))
         self.add_setting(String("geomapfish_crs", Scope.Global, 'EPSG:3857'))
         self.add_setting(String("geomapfish_user", Scope.Global, ''))
         self.add_setting(String("geomapfish_pass", Scope.Global, ''))
+
+        # number of results
+        self.add_setting(Integer("category_limit", Scope.Global, 8))
+        self.add_setting(Integer("total_limit", Scope.Global, 50))
