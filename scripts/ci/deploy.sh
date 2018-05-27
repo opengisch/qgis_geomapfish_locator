@@ -2,7 +2,7 @@
 
 set -e
 
-PLUGIN_NAME=$(echo $TRAVIS_REPO_SLUG | cut -d'/' -f 2)
+PLUGIN_NAME=$(echo $TRAVIS_REPO_SLUG | sed -r 's#^[^/]+/(qgis_)?([^/]+)$#\2#')
 METADATA_VERSION=v$(grep -Po "(?<=^version=).*" $PLUGIN_NAME/metadata.txt)
 
 # Check if metadata and tag matches
