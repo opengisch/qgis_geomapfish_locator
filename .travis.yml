@@ -1,6 +1,10 @@
 language: python
+
 python:
   - 3.5
+
+git:
+  submodules: false
 
 before_install:
   - >-
@@ -13,6 +17,7 @@ before_install:
   - chmod 600 github_deploy_key
   - eval $(ssh-agent -s)
   - ssh-add github_deploy_key
+  - git submodule update --init --recursive
 
 install:
   - pip install -r requirements.txt
