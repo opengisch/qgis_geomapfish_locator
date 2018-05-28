@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Geomapfish locator filter configuraiton</string>
+   <string>Geomapfish locator filter configuration</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="4" column="1">

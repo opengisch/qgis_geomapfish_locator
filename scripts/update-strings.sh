@@ -1,15 +1,21 @@
 #!/bin/bash
 LOCALES=$*
 
+# GNU prefix command for mac os support (gsed, gsplit)
+GP=
+if [[ "$OSTYPE" =~ darwin* ]]; then
+  GP=g
+fi
+
 PLUGIN_DIR=geomapfish_locator
 
 # Get newest .py files so we don't update strings unnecessarily
 
 CHANGED_FILES=0
-PYTHON_FILES=`find ${PLUGIN_DIR}/ -regextype sed -regex ".*\.\(py\|ui\)$" -type f`
+PYTHON_FILES=`${GP}find ${PLUGIN_DIR}/ -regextype sed -regex ".*\.\(py\|ui\)$" -type f`
 for PYTHON_FILE in $PYTHON_FILES
 do
-  CHANGED=$(stat -c %Y $PYTHON_FILE)
+  CHANGED=$(${GP}stat -c %Y $PYTHON_FILE)
   if [ ${CHANGED} -gt ${CHANGED_FILES} ]
   then
     CHANGED_FILES=${CHANGED}
@@ -32,7 +38,7 @@ do
     break
   fi
 
-  MODIFICATION_TIME=$(stat -c %Y ${TRANSLATION_FILE})
+  MODIFICATION_TIME=$(${GP}stat -c %Y ${TRANSLATION_FILE})
   if [ ${CHANGED_FILES} -gt ${MODIFICATION_TIME} ]
   then
     # Force translation string collection as a .py file has been updated

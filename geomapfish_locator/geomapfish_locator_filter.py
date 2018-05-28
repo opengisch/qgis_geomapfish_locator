@@ -61,7 +61,7 @@ class ConfigDialog(QDialog, DialogUi, SettingDialog):
 
 class GeomapfishLocatorFilter(QgsLocatorFilter):
 
-    USER_AGENT = b'Mozilla/5.0 QGIS NominatimLocatorFilter'
+    USER_AGENT = b'Mozilla/5.0 QGIS GeoMapFish Locator Filter'
 
     def __init__(self, map_canvas):
         super().__init__()
@@ -124,7 +124,6 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
             'partitionlimit': str(self.settings.value('category_limit'))
         }
 
-        headers = {}
         headers = {b'User-Agent': self.USER_AGENT}
         if self.settings.value('geomapfish_user') != '':
             user = self.settings.value('geomapfish_user')
