@@ -24,6 +24,7 @@
 #
 # ---------------------------------------------------------------------
 
+DEBUG = False
 
 from qgis.core import QgsApplication
 from .geomapfish_locator_filter import GeomapfishLocatorFilter

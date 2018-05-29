@@ -43,8 +43,7 @@ from osgeo import ogr
 from .qgissettingmanager.setting_dialog import SettingDialog, UpdateMode
 from .network_access_manager import NetworkAccessManager, RequestsException, RequestsExceptionUserAbort
 from .settings import Settings
-
-DEBUG=False
+from .geomapfish_locator_plugin import DEBUG
 
 DialogUi, _ = loadUiType(os.path.join(os.path.dirname(__file__), 'ui/config.ui'))
 
@@ -78,29 +77,29 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
             self.rubber_band.setWidth(4)
             self.rubber_band.setBrushStyle(Qt.NoBrush)
 
-    def name(self):
+    def name(self) -> str:
         return self.__class__.__name__
 
     def clone(self):
         return GeomapfishLocatorFilter(None)
 
-    def displayName(self):
+    def displayName(self) -> str:
         name = self.settings.value("filter_name")
         if name != '':
             return name
         return self.tr('Geomapfish service')
 
-    def prefix(self):
+    def prefix(self) -> str:
         return 'gmf'
 
-    def hasConfigWidget(self):
+    def hasConfigWidget(self) -> bool:
         return True
 
-    def openConfigWidget(self, parent):
+    def openConfigWidget(self, parent=None):
         ConfigDialog(parent).exec_()
 
     @staticmethod
-    def url_with_param(url, params):
+    def url_with_param(url, params) -> str:
         url = QUrl(url)
         q = QUrlQuery(url)
         for key, value in params.items():
@@ -192,7 +191,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         self.map_canvas.setExtent(rect)
         self.map_canvas.refresh()
 
-    def beautify_group(self, group):
+    def beautify_group(self, group) -> str:
         if self.settings.value("remove_leading_digits"):
             group = re.sub('^\d+', '', group)
         if self.settings.value("replace_underscore"):
@@ -209,7 +208,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
             self.info(msg)
 
     @staticmethod
-    def break_camelcase(identifier):
+    def break_camelcase(identifier) -> str:
         matches = re.finditer('.+?(?:(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|$)', identifier)
         return ' '.join([m.group(0) for m in matches])
 
