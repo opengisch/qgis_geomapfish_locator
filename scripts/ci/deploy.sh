@@ -8,11 +8,11 @@ if [[ "$OSTYPE" =~ darwin* ]]; then
   GP=g
 fi
 
-PLUGIN_NAME=$(echo $TRAVIS_REPO_SLUG | sed -r 's#^[^/]+/(qgis_)?([^/]+)$#\2#')
+PLUGIN_NAME=$(echo $TRAVIS_REPO_SLUG | ${GP}sed -r 's#^[^/]+/(qgis_)?([^/]+)$#\2#')
 METADATA_VERSION=v$(grep -Po "(?<=^version=).*" $PLUGIN_NAME/metadata.txt)
 
 # Ensure DEBUG is False
-${GP}sed -r -i 's/^DEBUG\s*=\s*True/DEBUG = False/'
+${GP}sed -r -i 's/^DEBUG\s*=\s*True/DEBUG = False/' ${PLUGIN_NAME}/${PLUGIN_NAME}_plugin.py
 
 # Check if metadata and tag matches
 if [ "$METADATA_VERSION" == "${TRAVIS_TAG}" ];
