@@ -27,8 +27,16 @@ before_install:
 install:
   - pip install -r requirements.txt
 
-script:
-  - scripts/ci/deploy.sh
+
+jobs:
+  include:
+    - stage: deploy
+      if: tag IS present
+      script: plugin_ci/release/deploy.sh
+
+    - stage: deploy
+      if: branch = master
+      script: plugin_ci/translate/update-translations.sh
 
 env:
   global:
