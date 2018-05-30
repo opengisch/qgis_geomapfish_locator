@@ -31,7 +31,7 @@ install:
 jobs:
   include:
     - stage: deploy
-      if: tag IS present and branch = master
+      if: tag IS present
       script: plugin_ci/release/release.sh
 
     - stage: deploy
