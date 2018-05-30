@@ -1,4 +1,2 @@
 transifex-client
 future
-git-archive-all
-

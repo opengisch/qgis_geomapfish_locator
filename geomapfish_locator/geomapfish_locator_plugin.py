@@ -27,12 +27,13 @@
 DEBUG = False
 
 from qgis.core import QgsApplication
+from qgis.gui import QgisInterface
 from .geomapfish_locator_filter import GeomapfishLocatorFilter
 
 
 class GeomapfishLocatorPlugin:
 
-    def __init__(self, iface):
+    def __init__(self, iface: QgisInterface):
         self.iface = iface
         self.gmf_filter = GeomapfishLocatorFilter(iface.mapCanvas())
         self.iface.registerLocatorFilter(self.gmf_filter)

@@ -35,9 +35,9 @@ from PyQt5.QtCore import QUrl, QUrlQuery, QByteArray
 from PyQt5.QtWidgets import QDialog
 from PyQt5.uic import loadUiType
 
-from qgis.core import Qgis, QgsMessageLog, QgsLocatorFilter, QgsLocatorResult, QgsRectangle, \
+from qgis.core import Qgis, QgsMessageLog, QgsLocatorFilter, QgsLocatorResult, \
     QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, QgsGeometry, QgsWkbTypes
-from qgis.gui import QgsRubberBand
+from qgis.gui import QgsRubberBand, QgsMapCanvas
 from osgeo import ogr
 
 from .qgissettingmanager.setting_dialog import SettingDialog, UpdateMode
@@ -58,19 +58,24 @@ class ConfigDialog(QDialog, DialogUi, SettingDialog):
         self.init_widgets()
 
 
+class FilterNotConfigured:
+    pass
+
+
 class GeomapfishLocatorFilter(QgsLocatorFilter):
 
     USER_AGENT = b'Mozilla/5.0 QGIS GeoMapFish Locator Filter'
 
-    def __init__(self, map_canvas):
+    def __init__(self, map_canvas: QgsMapCanvas = None):
         super().__init__()
         self.rubber_band = None
         self.settings = Settings()
         self.reply = None
 
+        # only get map_canvas on main thread, not when cloning
         if map_canvas is not None:
             self.map_canvas = map_canvas
-            self.rubber_band = QgsRubberBand(map_canvas)
+            self.rubber_band = QgsRubberBand(self.map_canvas)
             self.rubber_band.setColor(QColor(255, 255, 50, 200))
             self.rubber_band.setIcon(self.rubber_band.ICON_CIRCLE)
             self.rubber_band.setIconSize(15)
@@ -81,7 +86,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         return self.__class__.__name__
 
     def clone(self):
-        return GeomapfishLocatorFilter(None)
+        return GeomapfishLocatorFilter()
 
     def displayName(self) -> str:
         name = self.settings.value("filter_name")
@@ -110,18 +115,27 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
     def fetchResults(self, search, context, feedback):
         self.dbg_info("start GMF locator search...")
 
-        if len(search) < 2:
-            return
-
         if self.reply is not None and self.reply.isRunning():
             self.reply.abort()
 
         url = self.settings.value('geomapfish_url')
+
+        if url == "":
+            result = QgsLocatorResult()
+            result.filter = self
+            result.displayString = self.tr('Locator filter is not configured. Double-click to configure.')
+            result.userData = FilterNotConfigured
+            self.resultFetched.emit(result)
+            return
+
         params = {
             'query': search,
             'limit': str(self.settings.value('total_limit')),
             'partitionlimit': str(self.settings.value('category_limit'))
         }
+
+        if len(search) < 2:
+            return
 
         headers = {b'User-Agent': self.USER_AGENT}
         if self.settings.value('geomapfish_user') != '':
@@ -169,11 +183,16 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
             result = QgsLocatorResult()
             result.filter = self
             result.displayString = f['properties']['label']
-            result.group = self.beautify_group(f['properties']['layer_name'])
+            if Qgis.QGIS_VERSION_INT >= 30100:
+                result.group = self.beautify_group(f['properties']['layer_name'])
             result.userData = geometry
             self.resultFetched.emit(result)
 
     def triggerResult(self, result):
+        if result.userData == FilterNotConfigured:
+            self.openConfigWidget()
+            return
+
         # this should be run in the main thread, i.e. mapCanvas should not be None
         geometry = result.userData
 

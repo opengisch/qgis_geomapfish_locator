@@ -42,7 +42,7 @@ class Settings(SettingManager):
         self.add_setting(Bool("break_camelcase", Scope.Global, True))
 
         # connection settings
-        self.add_setting(String("geomapfish_url", Scope.Global, 'http://mapfish-geoportal.demo-camptocamp.com/1.5/search'))
+        self.add_setting(String("geomapfish_url", Scope.Global, ''))
         self.add_setting(String("geomapfish_crs", Scope.Global, 'EPSG:3857'))
         self.add_setting(String("geomapfish_user", Scope.Global, ''))
         self.add_setting(String("geomapfish_pass", Scope.Global, ''))
