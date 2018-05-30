@@ -16,8 +16,6 @@ repository=https://github.com/opengisch/qgis_geomapfish_locator
 
 category=Web
 
-# experimental flag
-experimental=False
+experimental=True
 
-# change icon...
 icon=icons/geomapfish.png
