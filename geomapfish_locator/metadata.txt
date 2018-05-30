@@ -6,6 +6,7 @@ description=A locator filter for Geomapfish services
 version=dev
 author=Denis Rouzaud
 email=denis@opengis.ch
+about=Allows to search in Geomapfish instances. Connection is also possible for private searches.
 
 # Tags are comma separated with spaces allowed
 tags=locator,geomapfish
