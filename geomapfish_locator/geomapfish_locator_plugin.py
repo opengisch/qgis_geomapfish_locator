@@ -26,7 +26,9 @@
 
 DEBUG = False
 
-from qgis.core import QgsApplication
+import locale
+import os
+from PyQt5.QtCore import QCoreApplication, QLocale, QSettings, QTranslator
 from qgis.gui import QgisInterface
 from .geomapfish_locator_filter import GeomapfishLocatorFilter
 
@@ -38,22 +40,15 @@ class GeomapfishLocatorPlugin:
         self.gmf_filter = GeomapfishLocatorFilter(iface.mapCanvas())
         self.iface.registerLocatorFilter(self.gmf_filter)
 
+        # initialize translation
+        qgis_locale = QLocale(QSettings().value('locale/userLocale'))
+        locale_path = os.path.join(os.path.dirname(__file__), 'i18n')
+        self.translator = QTranslator()
+        self.translator.load(qgis_locale, 'geomapfish_locator', '_', locale_path)
+        QCoreApplication.installTranslator(self.translator)
+
     def initGui(self):
         pass
 
     def unload(self):
         self.iface.deregisterLocatorFilter(self.gmf_filter)
-
-    # noinspection PyMethodMayBeStatic
-    def tr(self, message):
-        """Get the translation for a string using Qt translation API.
-
-        We implement this ourselves since we do not inherit QObject.
-
-        :param message: String for translation.
-        :type message: str, QString
-
-        :returns: Translated version of message.
-        :rtype: QString
-        """
-        return QgsApplication.translate('QGIS Locator Plugin', message)
