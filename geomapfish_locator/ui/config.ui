@@ -6,18 +6,54 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>476</width>
-    <height>349</height>
+    <width>621</width>
+    <height>479</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Geomapfish locator filter configuraiton</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="4" column="1">
-    <widget class="QgsProjectionSelectionWidget" name="geomapfish_crs"/>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="filter_name"/>
    </item>
-   <item row="5" column="0" colspan="2">
+   <item row="7" column="0" colspan="2">
+    <widget class="QgsCollapsibleGroupBox" name="mGroupBox_2">
+     <property name="title">
+      <string>Beautify category names</string>
+     </property>
+     <property name="collapsed">
+      <bool>true</bool>
+     </property>
+     <property name="saveCollapsedState">
+      <bool>true</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="remove_leading_digits">
+        <property name="text">
+         <string>Remove leading digits in group titles</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="replace_underscore">
+        <property name="text">
+         <string>Replace underscore by spaces</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="break_camelcase">
+        <property name="text">
+         <string>Break CamelCase</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="2">
     <widget class="QgsCollapsibleGroupBox" name="mGroupBox">
      <property name="title">
       <string>Advanced configuration</string>
@@ -57,6 +93,90 @@
      </layout>
     </widget>
    </item>
+   <item row="5" column="0" colspan="2">
+    <widget class="QgsCollapsibleGroupBox" name="mGroupBox_3">
+     <property name="title">
+      <string>Optional authentification</string>
+     </property>
+     <property name="collapsed">
+      <bool>true</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_5">
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Password</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="geomapfish_user"/>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="geomapfish_pass">
+        <property name="echoMode">
+         <enum>QLineEdit::PasswordEchoOnEdit</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Username</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label_8">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="pixmap">
+           <pixmap>../icons/warning.svg</pixmap>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>Password will be saved as clear text in application settings.</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Filter name</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QgsProjectionSelectionWidget" name="geomapfish_crs"/>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>URL</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>CRS</string>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="1">
     <widget class="QLineEdit" name="geomapfish_url"/>
    </item>
@@ -70,55 +190,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="QLineEdit" name="geomapfish_user"/>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Password</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QLineEdit" name="geomapfish_pass">
-     <property name="echoMode">
-      <enum>QLineEdit::PasswordEchoOnEdit</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Username</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>CRS</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>URL</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Filter name</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="filter_name"/>
-   </item>
-   <item row="7" column="1">
+   <item row="9" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -130,39 +202,6 @@
       </size>
      </property>
     </spacer>
-   </item>
-   <item row="6" column="0" colspan="2">
-    <widget class="QgsCollapsibleGroupBox" name="mGroupBox_2">
-     <property name="title">
-      <string>Beautify category names</string>
-     </property>
-     <property name="collapsed">
-      <bool>true</bool>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_3">
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="remove_leading_digits">
-        <property name="text">
-         <string>Remove leading digits in group titles</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="replace_underscore">
-        <property name="text">
-         <string>Replace underscore by spaces</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QCheckBox" name="break_camelcase">
-        <property name="text">
-         <string>Break CamelCase</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
    </item>
   </layout>
  </widget>
