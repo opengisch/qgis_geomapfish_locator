@@ -10,12 +10,12 @@ about=Allows to search in Geomapfish instances. Connection is also possible for 
 
 tags=locator,geomapfish
 
-tracker=https://github.com/opengisch/qgis_geomapfish_locator
+tracker=https://github.com/opengisch/qgis_geomapfish_locator/issues
 homepage=https://github.com/opengisch/qgis_geomapfish_locator
 repository=https://github.com/opengisch/qgis_geomapfish_locator
 
 category=Web
 
-experimental=True
+experimental=False
 
 icon=icons/geomapfish.png
