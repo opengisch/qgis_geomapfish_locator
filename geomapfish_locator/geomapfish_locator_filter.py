@@ -33,7 +33,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import QUrl, QUrlQuery, QByteArray
 from PyQt5.QtWidgets import QDialog
-from PyQt5.uic import loadUiType
+from qgis.PyQt.uic import loadUiType
 
 from qgis.core import Qgis, QgsMessageLog, QgsLocatorFilter, QgsLocatorResult, QgsApplication, \
     QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, QgsGeometry, QgsWkbTypes
