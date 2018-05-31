@@ -6,34 +6,61 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>503</width>
-    <height>522</height>
+    <width>476</width>
+    <height>349</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Geomapfish locator filter configuration</string>
+   <string>Geomapfish locator filter configuraiton</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="4" column="1">
     <widget class="QgsProjectionSelectionWidget" name="geomapfish_crs"/>
    </item>
-   <item row="6" column="1">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+   <item row="5" column="0" colspan="2">
+    <widget class="QgsCollapsibleGroupBox" name="mGroupBox">
+     <property name="title">
+      <string>Advanced configuration</string>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
+     <property name="collapsed">
+      <bool>true</bool>
      </property>
-    </spacer>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Maximum results per category</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="category_limit">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Maximum results in total</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="total_limit">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item row="1" column="1">
     <widget class="QLineEdit" name="geomapfish_url"/>
    </item>
-   <item row="7" column="1">
+   <item row="8" column="1">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -91,68 +118,47 @@
    <item row="0" column="1">
     <widget class="QLineEdit" name="filter_name"/>
    </item>
-   <item row="5" column="0" colspan="2">
-    <widget class="QgsCollapsibleGroupBox" name="mGroupBox">
-     <property name="title">
-      <string>Advanced configuration</string>
+   <item row="7" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="1">
-       <widget class="QSpinBox" name="category_limit">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-       </widget>
-      </item>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="6" column="0" colspan="2">
+    <widget class="QgsCollapsibleGroupBox" name="mGroupBox_2">
+     <property name="title">
+      <string>Beautify category names</string>
+     </property>
+     <property name="collapsed">
+      <bool>true</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
       <item row="1" column="0">
-       <widget class="QLabel" name="label_7">
+       <widget class="QCheckBox" name="remove_leading_digits">
         <property name="text">
-         <string>Maximum results in total</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QSpinBox" name="total_limit">
-        <property name="minimum">
-         <number>1</number>
+         <string>Remove leading digits in group titles</string>
         </property>
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QLabel" name="label_6">
+       <widget class="QCheckBox" name="replace_underscore">
         <property name="text">
-         <string>Maximum results per category</string>
+         <string>Replace underscore by spaces</string>
         </property>
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QgsCollapsibleGroupBox" name="mGroupBox_2">
-        <property name="title">
-         <string>Beautify category names</string>
+       <widget class="QCheckBox" name="break_camelcase">
+        <property name="text">
+         <string>Break CamelCase</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout_3">
-         <item row="1" column="0">
-          <widget class="QCheckBox" name="remove_leading_digits">
-           <property name="text">
-            <string>Remove leading digits in group titles</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QCheckBox" name="replace_underscore">
-           <property name="text">
-            <string>Replace underscore by spaces</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QCheckBox" name="break_camelcase">
-           <property name="text">
-            <string>Break CamelCase</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
        </widget>
       </item>
      </layout>

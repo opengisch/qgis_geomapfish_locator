@@ -35,7 +35,7 @@ from PyQt5.QtCore import QUrl, QUrlQuery, QByteArray
 from PyQt5.QtWidgets import QDialog
 from PyQt5.uic import loadUiType
 
-from qgis.core import Qgis, QgsMessageLog, QgsLocatorFilter, QgsLocatorResult, \
+from qgis.core import Qgis, QgsMessageLog, QgsLocatorFilter, QgsLocatorResult, QgsApplication, \
     QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, QgsGeometry, QgsWkbTypes
 from qgis.gui import QgsRubberBand, QgsMapCanvas
 from osgeo import ogr
@@ -123,8 +123,10 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         if url == "":
             result = QgsLocatorResult()
             result.filter = self
-            result.displayString = self.tr('Locator filter is not configured. Double-click to configure.')
+            result.displayString = self.tr('Locator filter is not configured.')
+            result.description = self.tr('Double-click to configure.')
             result.userData = FilterNotConfigured
+            result.icon = QgsApplication.getThemeIcon('mIconWarning.svg')
             self.resultFetched.emit(result)
             return
 
