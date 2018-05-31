@@ -37,7 +37,7 @@ from qgis.PyQt.uic import loadUiType
 
 from qgis.core import Qgis, QgsMessageLog, QgsLocatorFilter, QgsLocatorResult, QgsApplication, \
     QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, QgsGeometry, QgsWkbTypes
-from qgis.gui import QgsRubberBand, QgsMapCanvas
+from qgis.gui import QgsRubberBand, QgisInterface
 from osgeo import ogr
 
 from .qgissettingmanager.setting_dialog import SettingDialog, UpdateMode
@@ -66,15 +66,18 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
 
     USER_AGENT = b'Mozilla/5.0 QGIS GeoMapFish Locator Filter'
 
-    def __init__(self, map_canvas: QgsMapCanvas = None):
+    def __init__(self, iface: QgisInterface = None):
         super().__init__()
         self.rubber_band = None
         self.settings = Settings()
         self.reply = None
+        self.iface = None
+        self.map_canvas = None
 
         # only get map_canvas on main thread, not when cloning
-        if map_canvas is not None:
-            self.map_canvas = map_canvas
+        if iface is not None:
+            self.iface = iface
+            self.map_canvas = iface.mapCanvas()
             self.rubber_band = QgsRubberBand(self.map_canvas)
             self.rubber_band.setColor(QColor(255, 255, 50, 200))
             self.rubber_band.setIcon(self.rubber_band.ICON_CIRCLE)
@@ -112,7 +115,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         url.setQuery(q)
         return url.url()
 
-    def emit_bad_configuration(self, err):
+    def emit_bad_configuration(self, err=None):
         result = QgsLocatorResult()
         result.filter = self
         result.displayString = self.tr('Locator filter is not configured.')
@@ -198,6 +201,9 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
     def triggerResult(self, result):
         if result.userData == FilterNotConfigured:
             self.openConfigWidget()
+            if self.iface and hasattr(self.iface, 'invalidateLocatorResults'):
+                # from QGIS 3.2 iface has invalidateLocatorResults
+                self.iface.invalidateLocatorResults()
             return
 
         # this should be run in the main thread, i.e. mapCanvas should not be None
