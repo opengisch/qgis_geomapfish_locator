@@ -37,7 +37,7 @@ class GeomapfishLocatorPlugin:
 
     def __init__(self, iface: QgisInterface):
         self.iface = iface
-        self.gmf_filter = GeomapfishLocatorFilter(iface.mapCanvas())
+        self.gmf_filter = GeomapfishLocatorFilter(iface)
         self.iface.registerLocatorFilter(self.gmf_filter)
 
         # initialize translation
