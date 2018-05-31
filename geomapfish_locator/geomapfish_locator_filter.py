@@ -112,6 +112,16 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         url.setQuery(q)
         return url.url()
 
+    def emit_bad_configuration(self, err):
+        result = QgsLocatorResult()
+        result.filter = self
+        result.displayString = self.tr('Locator filter is not configured.')
+        result.description = err if err else self.tr('Double-click to configure.')
+        result.userData = FilterNotConfigured
+        result.icon = QgsApplication.getThemeIcon('mIconWarning.svg')
+        self.resultFetched.emit(result)
+        return
+
     def fetchResults(self, search, context, feedback):
         self.dbg_info("start GMF locator search...")
 
@@ -121,13 +131,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         url = self.settings.value('geomapfish_url')
 
         if url == "":
-            result = QgsLocatorResult()
-            result.filter = self
-            result.displayString = self.tr('Locator filter is not configured.')
-            result.description = self.tr('Double-click to configure.')
-            result.userData = FilterNotConfigured
-            result.icon = QgsApplication.getThemeIcon('mIconWarning.svg')
-            self.resultFetched.emit(result)
+            self.emit_bad_configuration()
             return
 
         params = {
@@ -158,6 +162,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         except RequestsExceptionUserAbort:
             pass
         except RequestsException as err:
+            self.emit_bad_configuration(str(err))
             self.info(err)
 
     def handle_response(self, response, content):

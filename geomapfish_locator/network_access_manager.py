@@ -341,7 +341,7 @@ class NetworkAccessManager(object):
         self.msg_log("Got response %s %s from %s" % \
                     (self.http_call_result.status_code,
                      self.http_call_result.status_message,
-                     self.reply.url().toString()))
+                     self.reply.url().toString() if self.reply else 'reply has been deleted'))
         for k, v in list(self.http_call_result.headers.items()):
             self.msg_log("%s: %s" % (k, v))
         if len(self.http_call_result.content) < 1024:
