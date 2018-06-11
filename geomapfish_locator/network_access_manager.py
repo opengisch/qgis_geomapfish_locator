@@ -29,8 +29,8 @@ __date__ = 'August 2016'
 import re
 import urllib.request, urllib.error, urllib.parse
 
-from qgis.PyQt.QtCore import pyqtSlot, QUrl, QEventLoop, QTimer, QCoreApplication, QObject
-from qgis.PyQt.QtNetwork import QNetworkRequest, QNetworkReply
+from PyQt5.QtCore import pyqtSlot, Qt, QUrl, QEventLoop, QTimer, QCoreApplication, QObject
+from PyQt5.QtNetwork import QNetworkRequest, QNetworkReply
 
 from qgis.core import QgsNetworkAccessManager, QgsAuthManager, QgsMessageLog
 
@@ -173,7 +173,7 @@ class NetworkAccessManager(object):
         url = urllib.parse.unquote(url)
         req.setUrl(QUrl(url))
         if headers is not None:
-            # This fixes a wierd error with compressed content not being correctly
+            # This fixes a weird error with compressed content not being correctly
             # inflated.
             # If you set the header on the QNetworkRequest you are basically telling
             # QNetworkAccessManager "I know what I'm doing, please don't do any content

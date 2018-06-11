@@ -180,21 +180,23 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
 
             nam = NetworkAccessManager()
             feedback.canceled.connect(nam.abort)
-            try:
-                (response, content) = nam.request(url, headers=headers, blocking=True)
-                self.handle_response(response, content)
-            except RequestsExceptionUserAbort:
-                pass
-            except RequestsException as err:
-                self.emit_bad_configuration(str(err))
-                self.info(err)
+            (response, content) = nam.request(url, headers=headers, blocking=True)
+            self.handle_response(response, content)
 
+        except RequestsExceptionUserAbort:
+            pass
+        except RequestsException as err:
+            self.emit_bad_configuration(str(err))
+            self.info(err)
         except Exception as e:
             self.info(str(e), Qgis.Critical)
             #exc_type, exc_obj, exc_traceback = sys.exc_info()
             #filename = os.path.split(exc_traceback.tb_frame.f_code.co_filename)[1]
             #self.info('{} {} {}'.format(exc_type, filename, exc_traceback.tb_lineno), Qgis.Critical)
             #self.info(traceback.print_exception(exc_type, exc_obj, exc_traceback), Qgis.Critical)
+
+        finally:
+            self.finished.emit()
 
     def handle_response(self, response, content):
         try:
@@ -257,7 +259,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         self.current_timer = QTimer()
         self.current_timer.timeout.connect(self.clear_results)
         self.current_timer.setSingleShot(True)
-        self.current_timer.start(10000)
+        self.current_timer.start(30000)
 
     def beautify_group(self, group) -> str:
         if self.settings.value("remove_leading_digits"):
