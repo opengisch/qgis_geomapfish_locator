@@ -74,17 +74,22 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         self.iface = None
         self.map_canvas = None
         self.current_timer = None
+        self.transform = None
 
         # only get map_canvas on main thread, not when cloning
         if iface is not None:
             self.iface = iface
             self.map_canvas = iface.mapCanvas()
+            self.map_canvas.destinationCrsChanged.connect(self.create_transform)
+
             self.rubber_band = QgsRubberBand(self.map_canvas)
             self.rubber_band.setColor(QColor(255, 255, 50, 200))
             self.rubber_band.setIcon(self.rubber_band.ICON_CIRCLE)
             self.rubber_band.setIconSize(15)
             self.rubber_band.setWidth(4)
             self.rubber_band.setBrushStyle(Qt.NoBrush)
+
+            self.create_transform()
 
     def name(self) -> str:
         return self.__class__.__name__
@@ -106,6 +111,13 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
 
     def openConfigWidget(self, parent=None):
         ConfigDialog(parent).exec_()
+
+    def create_transform(self):
+        srv_crs_authid = self.settings.value('geomapfish_crs')
+        src_crs = QgsCoordinateReferenceSystem(srv_crs_authid)
+        assert src_crs.isValid()
+        dst_crs = self.map_canvas.mapSettings().destinationCrs()
+        self.transform = QgsCoordinateTransform(src_crs, dst_crs, QgsProject.instance())
 
     @staticmethod
     def url_with_param(url, params) -> str:
@@ -233,13 +245,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
 
         # this should be run in the main thread, i.e. mapCanvas should not be None
         geometry = result.userData
-
-        srv_crs_authid = self.settings.value('geomapfish_crs')
-        src_crs = QgsCoordinateReferenceSystem(srv_crs_authid)
-        if src_crs.isValid():
-            dst_crs = self.map_canvas.mapSettings().destinationCrs()
-            tr = QgsCoordinateTransform(src_crs, dst_crs, QgsProject.instance())
-            geometry.transform(tr)
+        geometry.transform(self.transform)
 
         self.rubber_band.reset(geometry.type())
         self.rubber_band.addGeometry(geometry, None)
