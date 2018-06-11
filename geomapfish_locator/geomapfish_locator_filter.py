@@ -255,7 +255,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
 
     def beautify_group(self, group) -> str:
         if self.settings.value("remove_leading_digits"):
-            group = re.sub('^\d+', '', group)
+            group = re.sub('^[0-9]+', '', group)
         if self.settings.value("replace_underscore"):
             group = group.replace("_", " ")
         if self.settings.value("break_camelcase"):
