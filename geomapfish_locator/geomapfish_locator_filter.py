@@ -259,7 +259,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         self.current_timer = QTimer()
         self.current_timer.timeout.connect(self.clear_results)
         self.current_timer.setSingleShot(True)
-        self.current_timer.start(30000)
+        self.current_timer.start(5000)
 
     def beautify_group(self, group) -> str:
         if self.settings.value("remove_leading_digits"):
