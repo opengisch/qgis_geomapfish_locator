@@ -1,8 +1,0 @@
-[main]
-host = https://www.transifex.com
-
-[qgis_geomapfish_locator.geomapfish_locator]
-source_file = i18n/geomapfish_locator_en.ts
-source_lang = en
-file_filter = i18n/geomapfish_locator_<lang>.ts
-type = QT
