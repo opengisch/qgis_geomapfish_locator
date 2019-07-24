@@ -26,12 +26,12 @@ jobs:
     - stage: deploy
       if: tag IS present
       script:
-      - |
-        qgis-plugin-ci release ${TRAVIS_TAG}
-        --transifex-token ${TX_TOKEN}
-        --github-token ${GH_TOKEN}
-        --osgeo-username 3nids
-        --osgeo-password ${OSGEO_PASSWORD}
+        - >
+          qgis-plugin-ci release ${TRAVIS_TAG}
+          --transifex-token ${TX_TOKEN}
+          --github-token ${GH_TOKEN}
+          --osgeo-username 3nids
+          --osgeo-password ${OSGEO_PASSWORD}
 
 env:
   global:
