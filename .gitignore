@@ -3,5 +3,5 @@ __pycache__
 *.orig
 i18n
 .DS_Store
-github_deploy_key.out
+.tokens
 
