@@ -132,7 +132,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         result = QgsLocatorResult()
         result.filter = self
         result.displayString = self.tr('Locator filter is not configured.')
-        result.description = err if err else self.tr('Double-click to configure.')
+        result.description = err if err else self.tr('Double-click to configure it.')
         result.userData = FilterNotConfigured
         result.icon = QgsApplication.getThemeIcon('mIconWarning.svg')
         self.resultFetched.emit(result)
