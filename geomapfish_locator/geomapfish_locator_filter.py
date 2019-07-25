@@ -110,7 +110,8 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         return True
 
     def openConfigWidget(self, parent=None):
-        ConfigDialog(parent).exec_()
+        if ConfigDialog(parent).exec_():
+            self.create_transform()
 
     def create_transform(self):
         srv_crs_authid = self.settings.value('geomapfish_crs')
