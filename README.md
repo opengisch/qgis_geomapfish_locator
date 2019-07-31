@@ -17,4 +17,6 @@ Set the parameters of your service :
 
 * CRS (e.g. EPSG 21781)
 
-Click OK and search
+Validate and start search in the locator bar at the bottom left of the application.
+
+If you want to avoid typing the prefix of the filter (`gmf`), enable it by default in the locator bar settings.
