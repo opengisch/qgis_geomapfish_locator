@@ -20,11 +20,11 @@ scripts:
 jobs:
   include:
     - stage: push-translation
-      if: branch = master AND repo = opengisch/qgis_geomapfish_locator
+      if: branch = master AND type != pull_request
       script: qgis-plugin-ci push-translation ${TX_TOKEN}
 
     - stage: deploy
-      if: tag IS present AND repo = opengisch/qgis_geomapfish_locator
+      if: tag IS present AND type != pull_request
       script:
         - >
           qgis-plugin-ci release ${TRAVIS_TAG}
