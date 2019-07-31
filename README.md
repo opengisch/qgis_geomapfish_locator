@@ -9,7 +9,7 @@ Install the plugin
 
 `Settings` -> `Options` -> `Locator` and open the configuration dialog for `Geomapfish Locator`
 
-Set filter parameters for your search service :
+Set the parameters of your service :
 
 * Name of the filter (e.g. MysearchService)
 
