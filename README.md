@@ -13,7 +13,7 @@ Set filter parameters for your search service :
 
 * Name of the filter (e.g. MysearchService)
 
-* URL (e.g. https://www.sigip.ch/search)
+* URL (e.g. https://www.myservice.com/search)
 
 * CRS (e.g. EPSG 21781)
 
