@@ -3,7 +3,7 @@ A QGIS 3 locator plugin for Geomapfish services
 
 ## Quick start Guide
 
-Go to Extension -> Install and search for Geomapfish Locator
+Go to `Plugins` -> `Manage and Install Plugins` and search for Geomapfish Locator
 
 Install the plugin
 
