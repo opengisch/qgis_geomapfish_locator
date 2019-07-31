@@ -7,7 +7,7 @@ Go to `Plugins` -> `Manage and Install Plugins` and search for Geomapfish Locato
 
 Install the plugin
 
-Go to the locator options by clicking on the magnifier on the bottom left of the screen
+`Settings` -> `Options` -> `Locator` and open the configuration dialog for `Geomapfish Locator`
 
 Set filter parameters for your search service :
 
