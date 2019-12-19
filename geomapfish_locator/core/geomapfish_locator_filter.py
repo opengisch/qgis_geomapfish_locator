@@ -28,7 +28,6 @@
 import json
 import os
 import re
-import sys, traceback
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
@@ -42,9 +41,9 @@ from qgis.gui import QgsRubberBand, QgisInterface
 from osgeo import ogr
 
 from .qgissettingmanager.setting_dialog import SettingDialog, UpdateMode
-from .network_access_manager import NetworkAccessManager, RequestsException, RequestsExceptionUserAbort
-from .settings import Settings
-from .geomapfish_locator_plugin import DEBUG
+from geomapfish_locator.core.network_access_manager import NetworkAccessManager, RequestsException, RequestsExceptionUserAbort
+from geomapfish_locator.core.settings import Settings
+from geomapfish_locator.geomapfish_locator_plugin import DEBUG
 
 DialogUi, _ = loadUiType(os.path.join(os.path.dirname(__file__), 'ui/config.ui'))
 

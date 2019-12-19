@@ -24,7 +24,7 @@
 #
 # ---------------------------------------------------------------------
 
-from .qgissettingmanager import SettingManager, Scope, Bool, String, Integer
+from geomapfish_locator.qgissettingmanager import SettingManager, Scope, Bool, String, Integer
 
 pluginName = "geomapfsih_locator_plugin"
 

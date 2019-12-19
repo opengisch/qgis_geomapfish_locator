@@ -24,12 +24,12 @@
 #
 # ---------------------------------------------------------------------
 
-DEBUG = True
-
 import os
-from PyQt5.QtCore import QCoreApplication, QLocale, QSettings, QTranslator
+from qgis.PyQt.QtCore import QCoreApplication, QLocale, QSettings, QTranslator
 from qgis.gui import QgisInterface
-from .geomapfish_locator_filter import GeomapfishLocatorFilter
+from geomapfish_locator.core.geomapfish_locator_filter import GeomapfishLocatorFilter
+
+DEBUG = True
 
 
 class GeomapfishLocatorPlugin:
