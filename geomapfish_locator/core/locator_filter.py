@@ -29,10 +29,10 @@ import json
 import os
 import re
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor
-from PyQt5.QtCore import QUrl, QUrlQuery, QByteArray, QTimer, pyqtSlot
-from PyQt5.QtWidgets import QDialog
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtCore import QUrl, QUrlQuery, QByteArray, QTimer, pyqtSlot
+from qgis.PyQt.QtWidgets import QDialog
 from qgis.PyQt.uic import loadUiType
 
 from qgis.core import Qgis, QgsMessageLog, QgsLocatorFilter, QgsLocatorResult, QgsApplication, \
@@ -40,22 +40,20 @@ from qgis.core import Qgis, QgsMessageLog, QgsLocatorFilter, QgsLocatorResult, Q
 from qgis.gui import QgsRubberBand, QgisInterface
 from osgeo import ogr
 
-from .qgissettingmanager.setting_dialog import SettingDialog, UpdateMode
 from geomapfish_locator.core.network_access_manager import NetworkAccessManager, RequestsException, RequestsExceptionUserAbort
-from geomapfish_locator.core.settings import Settings
-from geomapfish_locator.geomapfish_locator_plugin import DEBUG
+from geomapfish_locator.core.geomapfish_locator_plugin import DEBUG
+from geomapfish_locator.core.service import Service
 
-DialogUi, _ = loadUiType(os.path.join(os.path.dirname(__file__), 'ui/config.ui'))
+DialogUi, _ = loadUiType(os.path.join(os.path.dirname(__file__), '../ui/config.ui'))
 
 
-class ConfigDialog(QDialog, DialogUi, SettingDialog):
-    def __init__(self, parent=None):
-        settings = Settings()
+class ConfigDialog(QDialog, DialogUi):
+    def __init__(self, service, parent=None):
         QDialog.__init__(self, parent)
-        SettingDialog.__init__(self, setting_manager=settings, mode=UpdateMode.DialogAccept)
+        # SettingDialog.__init__(self, setting_manager=settings, mode=UpdateMode.DialogAccept)
         self.setupUi(self)
-        self.settings = settings
-        self.init_widgets()
+        # self.settings = settings
+        # self.init_widgets()
 
 
 class FilterNotConfigured:
@@ -66,10 +64,10 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
 
     USER_AGENT = b'Mozilla/5.0 QGIS GeoMapFish Locator Filter'
 
-    def __init__(self, iface: QgisInterface = None):
+    def __init__(self, service: Service, iface: QgisInterface = None):
         super().__init__()
+        self.service = service
         self.rubber_band = None
-        self.settings = Settings()
         self.iface = None
         self.map_canvas = None
         self.current_timer = None
@@ -97,7 +95,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         return GeomapfishLocatorFilter()
 
     def displayName(self) -> str:
-        name = self.settings.value("filter_name")
+        name = self.service.name
         if name != '':
             return name
         return self.tr('Geomapfish service')
@@ -113,7 +111,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
             self.create_transform()
 
     def create_transform(self):
-        srv_crs_authid = self.settings.value('geomapfish_crs')
+        srv_crs_authid = self.service.crs
         src_crs = QgsCoordinateReferenceSystem(srv_crs_authid)
         assert src_crs.isValid()
         dst_crs = self.map_canvas.mapSettings().destinationCrs()
@@ -152,7 +150,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         try:
             self.dbg_info("start GMF locator search...")
 
-            url = self.settings.value('geomapfish_url')
+            url = self.service.url
 
             if url == "":
                 self.emit_bad_configuration()
@@ -160,20 +158,21 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
 
             params = {
                 'query': search,
-                'limit': str(self.settings.value('total_limit')),
-                'partitionlimit': str(self.settings.value('category_limit'))
+                'limit': str(self.service.total_limit),
+                'partitionlimit': str(self.service.category_limit)
             }
 
             if len(search) < 2:
                 return
 
             headers = {b'User-Agent': self.USER_AGENT}
-            if self.settings.value('geomapfish_user') != '':
-                user = self.settings.value('geomapfish_user')
-                password = self.settings.value('geomapfish_pass')
-                auth_data = "{}:{}".format(user, password)
-                b64 = QByteArray(auth_data.encode()).toBase64()
-                headers[QByteArray('Authorization'.encode())] = QByteArray('Basic '.encode()) + b64
+            # todo auth
+            # if self..value('geomapfish_user') != '':
+            #     user = self..value('geomapfish_user')
+            #     password = self..value('geomapfish_pass')
+            #     auth_data = "{}:{}".format(user, password)
+            #     b64 = QByteArray(auth_data.encode()).toBase64()
+            #     headers[QByteArray('Authorization'.encode())] = QByteArray('Basic '.encode()) + b64
 
             url = self.url_with_param(url, params)
             self.dbg_info(url)
@@ -262,11 +261,11 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         self.current_timer.start(5000)
 
     def beautify_group(self, group) -> str:
-        if self.settings.value("remove_leading_digits"):
+        if self.service.remove_leading_digits:
             group = re.sub('^[0-9]+', '', group)
-        if self.settings.value("replace_underscore"):
+        if self.service.replace_underscore:
             group = group.replace("_", " ")
-        if self.settings.value("break_camelcase"):
+        if self.service.break_camelcase:
             group = self.break_camelcase(group)
         return group
 

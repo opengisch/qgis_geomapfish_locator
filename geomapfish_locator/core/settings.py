@@ -24,7 +24,7 @@
 #
 # ---------------------------------------------------------------------
 
-from geomapfish_locator.qgissettingmanager import SettingManager, Scope, Bool, String, Integer
+from geomapfish_locator.qgissettingmanager import SettingManager, Scope, Dictionary
 
 pluginName = "geomapfsih_locator_plugin"
 
@@ -32,21 +32,5 @@ pluginName = "geomapfsih_locator_plugin"
 class Settings(SettingManager):
     def __init__(self):
         SettingManager.__init__(self, pluginName)
+        self.add_setting(Dictionary("services", Scope.Global, ''))
 
-        # change filter name
-        self.add_setting(String("filter_name", Scope.Global, ''))
-
-        # beautify group names
-        self.add_setting(Bool("remove_leading_digits", Scope.Global, True))
-        self.add_setting(Bool("replace_underscore", Scope.Global, True))
-        self.add_setting(Bool("break_camelcase", Scope.Global, True))
-
-        # connection settings
-        self.add_setting(String("geomapfish_url", Scope.Global, ''))
-        self.add_setting(String("geomapfish_crs", Scope.Global, 'EPSG:3857'))
-        self.add_setting(String("geomapfish_user", Scope.Global, ''))
-        self.add_setting(String("geomapfish_pass", Scope.Global, ''))
-
-        # number of results
-        self.add_setting(Integer("category_limit", Scope.Global, 8))
-        self.add_setting(Integer("total_limit", Scope.Global, 50))

@@ -1,12 +1,12 @@
 
 [general]
 name=Geomapfish Locator
-qgisMinimumVersion=3.0
+qgisMinimumVersion=3.4
 description=A locator filter for Geomapfish services
 version=dev
 author=Denis Rouzaud
 email=denis@opengis.ch
-about=Allows to search in Geomapfish instances. Connection is also possible for private searches.
+about=Allows to search across several Geomapfish instances
 
 tags=locator,geomapfish
 

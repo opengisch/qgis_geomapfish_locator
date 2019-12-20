@@ -24,20 +24,32 @@
 #
 # ---------------------------------------------------------------------
 
+
+DEBUG = True
+
+
+
 import os
 from qgis.PyQt.QtCore import QCoreApplication, QLocale, QSettings, QTranslator
 from qgis.gui import QgisInterface
-from geomapfish_locator.core.geomapfish_locator_filter import GeomapfishLocatorFilter
+from geomapfish_locator.core.locator_filter import GeomapfishLocatorFilter
+from geomapfish_locator.core.old_version_import import old_version_import
+from geomapfish_locator.core.settings import Settings
 
-DEBUG = True
 
 
 class GeomapfishLocatorPlugin:
 
     def __init__(self, iface: QgisInterface):
         self.iface = iface
-        self.gmf_filter = GeomapfishLocatorFilter(iface)
-        self.iface.registerLocatorFilter(self.gmf_filter)
+        self.locator_filters = {}
+
+        import_service = old_version_import()
+        if import_service:
+            self.add_service(import_service)
+
+        # self.gmf_filter = GeomapfishLocatorFilter(iface)
+        # self.iface.registerLocatorFilter(self.gmf_filter)
 
         # initialize translation
         qgis_locale = QLocale(QSettings().value('locale/userLocale'))
@@ -46,8 +58,19 @@ class GeomapfishLocatorPlugin:
         self.translator.load(qgis_locale, 'geomapfish_locator', '_', locale_path)
         QCoreApplication.installTranslator(self.translator)
 
+    def add_service(self, service):
+        if service.name in self.locator_filters:
+            # todo unload or skip
+            pass
+
+        locator_filter = GeomapfishLocatorFilter(service)
+        self.iface.registerLocatorFilter(locator_filter)
+        self.locator_filters[service.name] = locator_filter
+
+
     def initGui(self):
         pass
 
     def unload(self):
-        self.iface.deregisterLocatorFilter(self.gmf_filter)
+        for locator_filter in self.locator_filters.values():
+            self.iface.deregisterLocatorFilter(locator_filter)
