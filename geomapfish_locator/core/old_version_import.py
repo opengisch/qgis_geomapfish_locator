@@ -17,9 +17,9 @@
  ***************************************************************************/
  """
 
-from qgis.core import QgsSettings
+from qgis.core import QgsSettings, QgsAuthMethodConfig, QgsApplication
 from .service import Service
-from .utils import info
+from .utils import info, dbg_info
 
 
 def old_version_import() -> Service:
@@ -42,9 +42,13 @@ def old_version_import() -> Service:
 
         info("importing old service: {}".format(definition))
 
-
-
-        # todo: handle user,pass
+        if user:
+            config = QgsAuthMethodConfig('Basic')
+            config.setName('geomapfish_{}'.format(definition['name']))
+            config.setConfig('username', user)
+            config.setConfig('password', pwd)
+            QgsApplication.authManager().storeAuthenticationConfig(config)
+            dbg_info("created new auth id: {}".format(config.id()))
 
         # todo: delete old keys
 
