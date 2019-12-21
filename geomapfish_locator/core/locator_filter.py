@@ -1,39 +1,30 @@
 # -*- coding: utf-8 -*-
-# -----------------------------------------------------------
-#
-# QGIS Geomapfish Locator Plugin
-# Copyright (C) 2018 Denis Rouzaud
-#
-# -----------------------------------------------------------
-#
-# licensed under the terms of GNU GPL 2
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-#
-# ---------------------------------------------------------------------
+"""
+/***************************************************************************
+
+ QGIS Geomapfish Locator Plugin
+ Copyright (C) 2019 Denis Rouzaud
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+ """
 
 
 import json
-import os
 import re
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtCore import QUrl, QUrlQuery, QByteArray, QTimer, pyqtSlot
-from qgis.PyQt.QtWidgets import QDialog
-from qgis.PyQt.uic import loadUiType
+
 
 from qgis.core import Qgis, QgsMessageLog, QgsLocatorFilter, QgsLocatorResult, QgsApplication, \
     QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, QgsGeometry, QgsWkbTypes
@@ -43,17 +34,9 @@ from osgeo import ogr
 from geomapfish_locator.core.network_access_manager import NetworkAccessManager, RequestsException, RequestsExceptionUserAbort
 from geomapfish_locator.core.geomapfish_locator_plugin import DEBUG
 from geomapfish_locator.core.service import Service
+from geomapfish_locator.gui.filter_configuration_dialog import FilterConfigurationDialog
 
-DialogUi, _ = loadUiType(os.path.join(os.path.dirname(__file__), '../ui/config.ui'))
 
-
-class ConfigDialog(QDialog, DialogUi):
-    def __init__(self, service, parent=None):
-        QDialog.__init__(self, parent)
-        # SettingDialog.__init__(self, setting_manager=settings, mode=UpdateMode.DialogAccept)
-        self.setupUi(self)
-        # self.settings = settings
-        # self.init_widgets()
 
 
 class FilterNotConfigured:
@@ -107,7 +90,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         return True
 
     def openConfigWidget(self, parent=None):
-        if ConfigDialog(parent).exec_():
+        if FilterConfigurationDialog(self.service, parent).exec_():
             self.create_transform()
 
     def create_transform(self):

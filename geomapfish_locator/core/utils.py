@@ -15,15 +15,19 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- """
+"""
 
-from geomapfish_locator.qgissettingmanager import SettingManager, Scope, Dictionary
+from qgis.core import Qgis, QgsMessageLog
+from qgis.utils import iface
 
-pluginName = "geomapfsih_locator_plugin"
+DEBUG = True
 
 
-class Settings(SettingManager):
-    def __init__(self):
-        SettingManager.__init__(self, pluginName)
-        self.add_setting(Dictionary("services", Scope.Global, ''))
+def info(message: str, level: Qgis.MessageLevel = Qgis.Info):
+    QgsMessageLog.logMessage("{}: {}".format('SoLocator', message), "Locator bar", level)
+    iface.messageBar().pushMessage('SoLocator', message, level)
 
+
+def dbg_info(message: str):
+    if DEBUG:
+        QgsMessageLog.logMessage("{}: {}".format('SoLocator', message), "Locator bar", Qgis.Info)

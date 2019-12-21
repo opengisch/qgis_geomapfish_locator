@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>621</width>
-    <height>479</height>
+    <width>657</width>
+    <height>561</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="1">
-    <widget class="QLineEdit" name="filter_name"/>
+    <widget class="QLineEdit" name="name"/>
    </item>
    <item row="7" column="0" colspan="2">
     <widget class="QgsCollapsibleGroupBox" name="mGroupBox_2">
@@ -23,7 +23,7 @@
       <string>Beautify category names</string>
      </property>
      <property name="collapsed">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <property name="saveCollapsedState">
       <bool>true</bool>
@@ -59,7 +59,7 @@
       <string>Advanced configuration</string>
      </property>
      <property name="collapsed">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
@@ -99,56 +99,18 @@
       <string>Optional authentification</string>
      </property>
      <property name="collapsed">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_5">
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Password</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QLineEdit" name="geomapfish_user"/>
-      </item>
-      <item row="4" column="1">
-       <widget class="QLineEdit" name="geomapfish_pass">
-        <property name="echoMode">
-         <enum>QLineEdit::PasswordEchoOnEdit</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Username</string>
+         <string/>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" colspan="2">
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QLabel" name="label_8">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="pixmap">
-           <pixmap>../icons/warning.svg</pixmap>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_9">
-          <property name="text">
-           <string>Password will be saved as clear text in application settings.</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+      <item row="2" column="1">
+       <widget class="QgsAuthConfigSelect" name="mAuthConfigSelect"/>
       </item>
      </layout>
     </widget>
@@ -156,12 +118,12 @@
    <item row="0" column="0">
     <widget class="QLabel" name="label_5">
      <property name="text">
-      <string>Filter name</string>
+      <string>Name</string>
      </property>
     </widget>
    </item>
    <item row="4" column="1">
-    <widget class="QgsProjectionSelectionWidget" name="geomapfish_crs"/>
+    <widget class="QgsProjectionSelectionWidget" name="crs"/>
    </item>
    <item row="1" column="0">
     <widget class="QLabel" name="label">
@@ -178,7 +140,7 @@
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QLineEdit" name="geomapfish_url"/>
+    <widget class="QLineEdit" name="url"/>
    </item>
    <item row="8" column="1">
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -206,6 +168,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QgsAuthConfigSelect</class>
+   <extends>QWidget</extends>
+   <header>qgsauthconfigselect.h</header>
+  </customwidget>
   <customwidget>
    <class>QgsCollapsibleGroupBox</class>
    <extends>QGroupBox</extends>
