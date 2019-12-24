@@ -17,7 +17,7 @@
  ***************************************************************************/
  """
 
-from geomapfish_locator.qgissettingmanager import SettingManager, Scope, Dictionary
+from geomapfish_locator.qgissettingmanager import SettingManager, Scope, List
 
 pluginName = "geomapfsih_locator_plugin"
 
@@ -25,5 +25,5 @@ pluginName = "geomapfsih_locator_plugin"
 class Settings(SettingManager):
     def __init__(self):
         SettingManager.__init__(self, pluginName)
-        self.add_setting(Dictionary("services", Scope.Global, {}))
+        self.add_setting(List("services", Scope.Global, []))
 

@@ -19,7 +19,7 @@
 
 
 import os
-from qgis.PyQt.QtCore import QCoreApplication, QLocale, QSettings, QTranslator
+from qgis.PyQt.QtCore import QCoreApplication, QLocale, QSettings, QTranslator, pyqtSlot, QObject
 from qgis.PyQt.QtWidgets import QAction
 from qgis.gui import QgisInterface
 from geomapfish_locator.core.locator_filter import GeomapfishLocatorFilter
@@ -30,19 +30,20 @@ from geomapfish_locator.core.service import Service
 DEBUG = True
 
 
-class GeomapfishLocatorPlugin:
+class GeomapfishLocatorPlugin(QObject):
 
     plugin_name = "&Geomapfish Locator Filters"
 
     def __init__(self, iface: QgisInterface):
+        QObject.__init__(self)
         self.iface = iface
-        self.locator_filters = {}
+        self.locator_filters = []
         self.settings = Settings()
-        self.menu_actions = {}
-        self.menu_actions['new_filter'] = QAction(QCoreApplication.translate('Geomapfish', 'Add new service'), self.iface.mainWindow())
-        self.iface.addPluginToMenu(self.plugin_name, self.menu_actions['new_filter'])
+        menu_action = QAction(QCoreApplication.translate('Geomapfish', 'Add new service'), self.iface.mainWindow())
+        self.iface.addPluginToMenu(self.plugin_name, menu_action)
+        self.menu_actions = [menu_action]
 
-        for definition in self.settings.value('services').values():
+        for definition in self.settings.value('services'):
             self.add_service(Service(definition))
 
         import_service = old_version_import()
@@ -60,30 +61,42 @@ class GeomapfishLocatorPlugin:
         action = QAction(locator_filter.service.name, self.iface.mainWindow())
         action.triggered.connect(lambda _: locator_filter.openConfigWidget())
         self.iface.addPluginToMenu(self.plugin_name, action)
-        self.menu_actions[locator_filter.service.name] = action
+        self.menu_actions.append(action)
 
     def add_service(self, service):
-        if service.name in self.locator_filters:
-            # todo unload or skip
-            return
+        for locator_filter in self.locator_filters:
+            if service.name == locator_filter.service.name:
+                service.name = QCoreApplication.translate('Geomapfish', '{service} copy'.format(service=service.name))
 
         locator_filter = GeomapfishLocatorFilter(service, self.iface)
+        locator_filter.changed.connect(self.filter_changed)
         self.add_locator_menu_action(locator_filter)
         self.iface.registerLocatorFilter(locator_filter)
-        self.locator_filters[service.name] = locator_filter
+        self.locator_filters.append(locator_filter)
         self.save_services()
 
     def initGui(self):
         pass
 
     def unload(self):
-        for action in self.menu_actions.values():
-            self.iface.removePluginMenu(self.plugin_name, action)
-        for locator_filter in self.locator_filters.values():
+        for menu_action in self.menu_actions:
+            self.iface.removePluginMenu(self.plugin_name, menu_action)
+        for locator_filter in self.locator_filters:
             self.iface.deregisterLocatorFilter(locator_filter)
 
     def save_services(self):
-        services = {}
-        for name, locator_filter in self.locator_filters.items():
-            services[name] = locator_filter.service.as_dict()
+        services = []
+        for locator_filter in self.locator_filters:
+            services.append(locator_filter.service.as_dict())
         self.settings.set_value('services', services)
+
+    def refresh_menu(self):
+        for menu_action in self.menu_actions[1:]:
+            self.iface.removePluginMenu(self.plugin_name, menu_action)
+        for locator_filter in self.locator_filters:
+            self.add_locator_menu_action(locator_filter)
+
+    @pyqtSlot()
+    def filter_changed(self):
+        self.refresh_menu()
+        self.save_services()

@@ -23,7 +23,7 @@ import re
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtCore import QUrl, QUrlQuery, QTimer, pyqtSlot
+from qgis.PyQt.QtCore import QUrl, QUrlQuery, QTimer, pyqtSlot, pyqtSignal
 
 from qgis.core import Qgis, QgsMessageLog, QgsLocatorFilter, QgsLocatorResult, QgsApplication, \
     QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, QgsGeometry, QgsWkbTypes
@@ -45,6 +45,8 @@ class FilterNotConfigured:
 class GeomapfishLocatorFilter(QgsLocatorFilter):
 
     USER_AGENT = b'Mozilla/5.0 QGIS GeoMapFish Locator Filter'
+
+    changed = pyqtSignal()
 
     def __init__(self, service: Service, iface: QgisInterface = None):
         super().__init__()
@@ -90,6 +92,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         if cfg.exec_():
             self.service = cfg.service.clone()
             self.create_transform()
+            self.changed.emit()
 
     def create_transform(self):
         srv_crs_authid = self.service.crs
