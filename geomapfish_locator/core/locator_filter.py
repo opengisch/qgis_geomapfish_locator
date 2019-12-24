@@ -48,7 +48,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
 
     def __init__(self, service: Service, iface: QgisInterface = None):
         super().__init__()
-        self.service = service
+        self.service = service.clone()
         self.rubber_band = None
         self.iface = None
         self.map_canvas = None
@@ -74,7 +74,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         return self.__class__.__name__
 
     def clone(self):
-        return GeomapfishLocatorFilter()
+        return GeomapfishLocatorFilter(self.service)
 
     def displayName(self) -> str:
         name = self.service.name

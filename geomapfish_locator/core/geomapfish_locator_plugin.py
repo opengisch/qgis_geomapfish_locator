@@ -53,7 +53,7 @@ class GeomapfishLocatorPlugin:
     def add_service(self, service):
         if service.name in self.locator_filters:
             # todo unload or skip
-            pass
+            return
 
         locator_filter = GeomapfishLocatorFilter(service)
         self.iface.registerLocatorFilter(locator_filter)

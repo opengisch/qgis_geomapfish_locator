@@ -17,6 +17,7 @@
  ***************************************************************************/
  """
 
+import copy
 
 class Service:
     def __init__(self, definition: dict):
@@ -32,6 +33,9 @@ class Service:
         self.remove_leading_digits = definition.get('remove_leading_digits', True)
         self.replace_underscore = definition.get('replace_underscore', True)
         self.break_camelcase = definition.get('break_camelcase', True)
+
+    def clone(self):
+        return copy.deepcopy(self)
 
     def as_dict(self) -> dict:
         return {
