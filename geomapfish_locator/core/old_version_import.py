@@ -25,22 +25,22 @@ from .utils import info, dbg_info
 
 
 def old_version_import() -> Service:
-
-    if QgsSettings().contains('plugins/geomapfsih_locator_plugin/geomapfish_url'):
+    settings = QgsSettings()
+    if settings.contains('plugins/geomapfsih_locator_plugin/geomapfish_url'):
         definition = dict()
-        definition['name'] = QgsSettings().value('plugins/geomapfsih_locator_plugin/filter_name', 'geomapfish', type=str)
-        definition['url'] = QgsSettings().value('plugins/geomapfsih_locator_plugin/geomapfish_url', '', type=str)
-        definition['crs'] = QgsSettings().value('plugins/geomapfsih_locator_plugin/geomapfish_crs', '', type=str)
+        definition['name'] = settings.value('plugins/geomapfsih_locator_plugin/filter_name', 'geomapfish', type=str)
+        definition['url'] = settings.value('plugins/geomapfsih_locator_plugin/geomapfish_url', '', type=str)
+        definition['crs'] = settings.value('plugins/geomapfsih_locator_plugin/geomapfish_crs', '', type=str)
 
-        definition['remove_leading_digits'] = QgsSettings().value('plugins/geomapfsih_locator_plugin/remove_leading_digits', True, type=bool)
-        definition['replace_underscore'] = QgsSettings().value('plugins/geomapfsih_locator_plugin/replace_underscore', True, type=bool)
-        definition['break_camelcase'] = QgsSettings().value('plugins/geomapfsih_locator_plugin/break_camelcase', True, type=bool)
+        definition['remove_leading_digits'] = settings.value('plugins/geomapfsih_locator_plugin/remove_leading_digits', True, type=bool)
+        definition['replace_underscore'] = settings.value('plugins/geomapfsih_locator_plugin/replace_underscore', True, type=bool)
+        definition['break_camelcase'] = settings.value('plugins/geomapfsih_locator_plugin/break_camelcase', True, type=bool)
 
-        definition['category_limit'] = QgsSettings().value('plugins/geomapfsih_locator_plugin/category_limit', 8, type=int)
-        definition['total_limit'] = QgsSettings().value('plugins/geomapfsih_locator_plugin/total_limit', 50, type=int)
+        definition['category_limit'] = settings.value('plugins/geomapfsih_locator_plugin/category_limit', 8, type=int)
+        definition['total_limit'] = settings.value('plugins/geomapfsih_locator_plugin/total_limit', 50, type=int)
 
-        user = QgsSettings().value('plugins/geomapfsih_locator_plugin/geomapfish_user', '', type=str)
-        pwd = QgsSettings().value('plugins/geomapfsih_locator_plugin/geomapfish_pass', '', type=str)
+        user = settings.value('plugins/geomapfsih_locator_plugin/geomapfish_user', '', type=str)
+        pwd = settings.value('plugins/geomapfsih_locator_plugin/geomapfish_pass', '', type=str)
 
         info("importing old service: {}".format(definition))
 
@@ -75,8 +75,21 @@ def old_version_import() -> Service:
 
 
 def drop_keys():
-    # TODO
-    pass
+    settings = QgsSettings()
+
+    settings.remove('plugins/geomapfsih_locator_plugin/filter_name')
+    settings.remove('plugins/geomapfsih_locator_plugin/geomapfish_url')
+    settings.remove('plugins/geomapfsih_locator_plugin/geomapfish_crs')
+
+    settings.remove('plugins/geomapfsih_locator_plugin/remove_leading_digits')
+    settings.remove('plugins/geomapfsih_locator_plugin/replace_underscore')
+    settings.remove('plugins/geomapfsih_locator_plugin/break_camelcase')
+
+    settings.remove('plugins/geomapfsih_locator_plugin/category_limit')
+    settings.remove('plugins/geomapfsih_locator_plugin/total_limit')
+
+    settings.remove('plugins/geomapfsih_locator_plugin/geomapfish_user')
+    settings.remove('plugins/geomapfsih_locator_plugin/geomapfish_pass')
 
 
 
