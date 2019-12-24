@@ -29,10 +29,10 @@ __date__ = 'August 2016'
 import re
 import urllib.request, urllib.error, urllib.parse
 
-from PyQt5.QtCore import pyqtSlot, Qt, QUrl, QEventLoop, QTimer, QCoreApplication, QObject
-from PyQt5.QtNetwork import QNetworkRequest, QNetworkReply
+from qgis.PyQt.QtCore import QUrl, QEventLoop
+from qgis.PyQt.QtNetwork import QNetworkRequest, QNetworkReply
 
-from qgis.core import QgsNetworkAccessManager, QgsAuthManager, QgsMessageLog
+from qgis.core import QgsNetworkAccessManager, QgsMessageLog, QgsApplication
 
 # FIXME: ignored
 DEFAULT_MAX_REDIRECTS = 4
@@ -188,7 +188,7 @@ class NetworkAccessManager(object):
                 req.setRawHeader(k, v)
         if self.authid:
             self.msg_log("Update request w/ authid: {0}".format(self.authid))
-            QgsAuthManager.instance().updateNetworkRequest(req, self.authid)
+            QgsApplication.authManager().updateNetworkRequest(req, self.authid)
         if self.reply is not None and self.reply.isRunning():
             self.reply.close()
         if method.lower() == 'delete':
@@ -210,7 +210,7 @@ class NetworkAccessManager(object):
             self.reply = func(req)
         if self.authid:
             self.msg_log("Update reply w/ authid: {0}".format(self.authid))
-            QgsAuthManager.instance().updateNetworkReply(self.reply, self.authid)
+            QgsApplication.authManager().updateNetworkReply(self.reply, self.authid)
 
         # necessary to trap local timeout manage by QgsNetworkAccessManager
         # calling QgsNetworkAccessManager::abortRequest

@@ -159,7 +159,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
             url = self.url_with_param(url, params)
             self.dbg_info(url)
 
-            nam = NetworkAccessManager()
+            nam = NetworkAccessManager(self.service.authid)
             feedback.canceled.connect(nam.abort)
             (response, content) = nam.request(url, headers=headers, blocking=True)
             self.handle_response(response, content)

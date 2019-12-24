@@ -110,7 +110,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QgsAuthConfigSelect" name="mAuthConfigSelect"/>
+       <widget class="QgsAuthConfigSelect" name="authid"/>
       </item>
      </layout>
     </widget>

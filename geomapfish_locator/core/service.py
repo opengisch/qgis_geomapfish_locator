@@ -19,6 +19,7 @@
 
 import copy
 
+
 class Service:
     def __init__(self, definition: dict):
         self.name = definition['name']

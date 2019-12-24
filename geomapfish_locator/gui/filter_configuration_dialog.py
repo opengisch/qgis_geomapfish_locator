@@ -41,6 +41,7 @@ class FilterConfigurationDialog(QDialog, DialogUi):
         self.name.setText(service.name)
         self.crs.setCrs(QgsCoordinateReferenceSystem(service.crs))
         self.url.setText(service.url)
+        self.authid.setConfigId(service.authid)
 
         self.remove_leading_digits.setChecked(service.remove_leading_digits)
         self.replace_underscore.setChecked(service.replace_underscore)

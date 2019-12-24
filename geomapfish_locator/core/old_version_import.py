@@ -45,7 +45,7 @@ def old_version_import() -> Service:
         info("importing old service: {}".format(definition))
 
         if user:
-            ans = QMessageBox.question(
+            reply = QMessageBox.question(
                 None,
                 "Geomapfish Locator",
                 QCoreApplication.translate(
@@ -55,7 +55,7 @@ def old_version_import() -> Service:
                     "If not, they will be removed."
                 )
             )
-            if ans == QMessageBox.Yes:
+            if reply == QMessageBox.Yes:
                 config = QgsAuthMethodConfig('Basic')
                 config.setName('geomapfish_{}'.format(definition['name']))
                 config.setConfig('username', user)
