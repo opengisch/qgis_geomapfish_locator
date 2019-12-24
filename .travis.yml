@@ -7,6 +7,7 @@ git:
   submodules: false
 
 before_install:
+  - sudo apt-get -y install libqt5gui5 # fix missing packages
   # cannot use SSH to fetch submodule
   - sed -i 's#git@github.com:#https://github.com/#' .gitmodules
   - git submodule update --init --recursive

@@ -58,7 +58,6 @@ class GeomapfishLocatorPlugin:
         self.iface.registerLocatorFilter(locator_filter)
         self.locator_filters[service.name] = locator_filter
 
-
     def initGui(self):
         pass
 

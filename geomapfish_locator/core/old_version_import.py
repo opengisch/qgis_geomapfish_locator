@@ -17,6 +17,8 @@
  ***************************************************************************/
  """
 
+from qgis.PyQt.QtCore import QObject
+from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.core import QgsSettings, QgsAuthMethodConfig, QgsApplication
 from .service import Service
 from .utils import info, dbg_info
@@ -43,19 +45,34 @@ def old_version_import() -> Service:
         info("importing old service: {}".format(definition))
 
         if user:
-            config = QgsAuthMethodConfig('Basic')
-            config.setName('geomapfish_{}'.format(definition['name']))
-            config.setConfig('username', user)
-            config.setConfig('password', pwd)
-            QgsApplication.authManager().storeAuthenticationConfig(config)
-            dbg_info("created new auth id: {}".format(config.id()))
+            ans = QMessageBox.question(
+                None,
+                "Geomapfish Locator",
+                QObject.tr(QObject(), "User and password were saved in clear text in former Geomapfish plugin. "
+                           "Would you like to use QGIS authentification to store these credentials? "
+                           "If not, they will be removed.")
+            )
+            if ans == QMessageBox.Yes:
+                config = QgsAuthMethodConfig('Basic')
+                config.setName('geomapfish_{}'.format(definition['name']))
+                config.setConfig('username', user)
+                config.setConfig('password', pwd)
+                QgsApplication.authManager().storeAuthenticationConfig(config)
+                dbg_info("created new auth id: {}".format(config.id()))
+            else:
+                drop_keys()
+                return None
 
-        # todo: delete old keys
-
+        drop_keys()
         return Service(definition)
 
     else:
         return None
+
+
+def drop_keys():
+    # TODO
+    pass
 
 
 
