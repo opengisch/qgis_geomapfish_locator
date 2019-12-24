@@ -23,8 +23,7 @@ import re
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtCore import QUrl, QUrlQuery, QByteArray, QTimer, pyqtSlot
-
+from qgis.PyQt.QtCore import QUrl, QUrlQuery, QTimer, pyqtSlot
 
 from qgis.core import Qgis, QgsMessageLog, QgsLocatorFilter, QgsLocatorResult, QgsApplication, \
     QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, QgsGeometry, QgsWkbTypes
@@ -33,6 +32,7 @@ from osgeo import ogr
 
 from geomapfish_locator.core.network_access_manager import NetworkAccessManager, RequestsException, RequestsExceptionUserAbort
 from geomapfish_locator.core.service import Service
+from geomapfish_locator.core.utils import slugify
 from geomapfish_locator.gui.filter_configuration_dialog import FilterConfigurationDialog
 
 DEBUG = True
@@ -71,16 +71,13 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
             self.create_transform()
 
     def name(self) -> str:
-        return self.__class__.__name__
+        return slugify(self.displayName())
 
     def clone(self):
         return GeomapfishLocatorFilter(self.service)
 
     def displayName(self) -> str:
-        name = self.service.name
-        if name != '':
-            return name
-        return self.tr('Geomapfish service')
+        return self.service.name
 
     def prefix(self) -> str:
         return 'gmf'
@@ -148,13 +145,6 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
                 return
 
             headers = {b'User-Agent': self.USER_AGENT}
-            # todo auth
-            # if self..value('geomapfish_user') != '':
-            #     user = self..value('geomapfish_user')
-            #     password = self..value('geomapfish_pass')
-            #     auth_data = "{}:{}".format(user, password)
-            #     b64 = QByteArray(auth_data.encode()).toBase64()
-            #     headers[QByteArray('Authorization'.encode())] = QByteArray('Basic '.encode()) + b64
 
             url = self.url_with_param(url, params)
             self.dbg_info(url)
