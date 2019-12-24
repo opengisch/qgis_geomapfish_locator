@@ -17,7 +17,7 @@
  ***************************************************************************/
  """
 
-from qgis.PyQt.QtCore import QObject
+from qgis.PyQt.QtCore import QObject, QCoreApplication
 from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.core import QgsSettings, QgsAuthMethodConfig, QgsApplication
 from .service import Service
@@ -48,9 +48,12 @@ def old_version_import() -> Service:
             ans = QMessageBox.question(
                 None,
                 "Geomapfish Locator",
-                QObject.tr(QObject(), "User and password were saved in clear text in former Geomapfish plugin. "
-                           "Would you like to use QGIS authentification to store these credentials? "
-                           "If not, they will be removed.")
+                QCoreApplication.translate(
+                    "Geomapfish Locator",
+                    "User and password were saved in clear text in former Geomapfish plugin. "
+                    "Would you like to use QGIS authentification to store these credentials? "
+                    "If not, they will be removed."
+                )
             )
             if ans == QMessageBox.Yes:
                 config = QgsAuthMethodConfig('Basic')
@@ -58,6 +61,7 @@ def old_version_import() -> Service:
                 config.setConfig('username', user)
                 config.setConfig('password', pwd)
                 QgsApplication.authManager().storeAuthenticationConfig(config)
+                definition['authid'] = config.id()
                 dbg_info("created new auth id: {}".format(config.id()))
             else:
                 drop_keys()

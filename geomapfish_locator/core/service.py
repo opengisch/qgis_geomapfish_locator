@@ -23,6 +23,7 @@ class Service:
         self.name = definition['name']
         self.url = definition['url']
         self.crs = definition['crs']
+        self.authid = definition['authid']
 
         self.category_limit = definition.get('category_limit', 8)
         self.total_limit = definition.get('total_limit', 40)
@@ -31,4 +32,19 @@ class Service:
         self.remove_leading_digits = definition.get('remove_leading_digits', True)
         self.replace_underscore = definition.get('replace_underscore', True)
         self.break_camelcase = definition.get('break_camelcase', True)
+
+    def as_dict(self) -> dict:
+        return {
+            'name': self.name,
+            'url': self.url,
+            'crs': self.crs,
+            'authid': self.authid,
+            'category_limit': self.category_limit,
+            'total_limit': self.total_limit,
+            'remove_leading_digits': self.remove_leading_digits,
+            'replace_underscore': self.replace_underscore,
+            'break_camelcase': self.break_camelcase
+        }
+
+
 

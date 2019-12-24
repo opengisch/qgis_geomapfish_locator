@@ -32,11 +32,10 @@ from qgis.gui import QgsRubberBand, QgisInterface
 from osgeo import ogr
 
 from geomapfish_locator.core.network_access_manager import NetworkAccessManager, RequestsException, RequestsExceptionUserAbort
-from geomapfish_locator.core.geomapfish_locator_plugin import DEBUG
 from geomapfish_locator.core.service import Service
 from geomapfish_locator.gui.filter_configuration_dialog import FilterConfigurationDialog
 
-
+DEBUG = True
 
 
 class FilterNotConfigured:
