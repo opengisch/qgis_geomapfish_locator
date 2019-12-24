@@ -86,7 +86,9 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         return True
 
     def openConfigWidget(self, parent=None):
-        if FilterConfigurationDialog(self.service, parent).exec_():
+        cfg = FilterConfigurationDialog(self.service, parent)
+        if cfg.exec_():
+            self.service = cfg.service.clone()
             self.create_transform()
 
     def create_transform(self):

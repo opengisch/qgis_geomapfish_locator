@@ -67,7 +67,7 @@ class GeomapfishLocatorPlugin:
             # todo unload or skip
             return
 
-        locator_filter = GeomapfishLocatorFilter(service)
+        locator_filter = GeomapfishLocatorFilter(service, self.iface)
         self.add_locator_menu_action(locator_filter)
         self.iface.registerLocatorFilter(locator_filter)
         self.locator_filters[service.name] = locator_filter

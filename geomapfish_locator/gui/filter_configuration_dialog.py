@@ -37,6 +37,10 @@ class FilterConfigurationDialog(QDialog, DialogUi):
     def __init__(self, service, parent=None):
         QDialog.__init__(self, parent)
         self.setupUi(self)
+
+        self.service = service.clone()
+
+        self.accepted.connect(self.save_service)
         
         self.name.setText(service.name)
         self.crs.setCrs(QgsCoordinateReferenceSystem(service.crs))
@@ -49,3 +53,18 @@ class FilterConfigurationDialog(QDialog, DialogUi):
 
         self.category_limit.setValue(service.category_limit)
         self.total_limit.setValue(service.total_limit)
+
+    def save_service(self):
+        self.service.name = self.name.text()
+        self.service.crs = self.crs.crs().authid()
+        self.service.url = self.url.text()
+        self.service.authid = self.authid.configId()
+
+        self.service.remove_leading_digits = self.remove_leading_digits.isChecked()
+        self.service.replace_underscore = self.replace_underscore.isChecked()
+        self.service.break_camelcase = self.break_camelcase.isChecked()
+
+        self.service.category_limit = self.category_limit.value()
+        self.service.total_limit = self.total_limit.value()
+
+
