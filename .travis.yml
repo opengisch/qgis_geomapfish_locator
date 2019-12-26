@@ -37,6 +37,7 @@ jobs:
 
 env:
   global:
+    - LD_LIBRARY_PATH=/usr/local/lib/python3.7/site-packages/PyQt5/Qt/lib
     - OSGEO_USERNAME=3nids
     # OSGEO_PASSWORD
     - secure: "kEqxYYuS0UEMw7MfK8Pp6XmSB/ojf0ek0VnsvGfqYZOGK0/mP+HPrqjCqZbM+a/VxWcWrI63MkpQmncwzDC9uSAdmp6ArwZStOc9RTs17vbM//PB/aosiTrYSpMFyE8PDEcxdaG2xMrHP0G+9gFMHItvJUEheFSS54NvTzLVnG4UQDtzIOkkrP58jWeS0emkfnoNpi6ozQenGmrHXiShBGV2aNOnr57Tr44mnRCp+sZyde7XJZ9pEb+xUn/XmctD3kiCB04M7mPqbMIeY8evvuEZMNtGyycUzhKlI3NPgzjv5HWT2Osviu80sFIGCMNy2rlv3kb9ahnhc6ezmW1m8BPO14TtdOLp+IpYi0VznuIkL8DsGPI6bRPzqneGCY40azP653FLTgCQj8nw76A4d7p7OIP5ebLMYMg6uApkiM8l8k293lEdYX5ho/f5ZWuKkmsxNXlavaCGgLYIdF+t6IoPCg1m8BswN47gmkgsXZppJz5doGE3QYO+SS+Wcz3FsnibuDFJNgLaEnrjofy1QT6QmUgrUHsHoph1r47vi+ci5Ltf0TTtGzkR0HeyGwdBRGY3sMbjWWFwymGzMNWwnjQtIVDFe2fmHr49chadR74jnGHW1Oe487wrWp57+Dunl7g+/jxP8mMgO0r0tx/reetAHzzSh4diX9NNazy4D7Y="
