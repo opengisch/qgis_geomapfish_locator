@@ -44,6 +44,7 @@ class GeomapfishLocatorPlugin(QObject):
         menu_action = QAction(QCoreApplication.translate('Geomapfish', 'Add new service'), self.iface.mainWindow())
         menu_action.triggered.connect(self.new_service)
         self.iface.addPluginToMenu(self.plugin_name, menu_action)
+        self.iface.pluginMenu()
         self.menu_actions = [menu_action]
 
         for definition in self.settings.value('services'):
@@ -59,6 +60,9 @@ class GeomapfishLocatorPlugin(QObject):
         self.translator = QTranslator()
         self.translator.load(qgis_locale, 'geomapfish_locator', '_', locale_path)
         QCoreApplication.installTranslator(self.translator)
+
+    def initGui(self):
+        pass
 
     def add_locator_menu_action(self, locator_filter: GeomapfishLocatorFilter):
         action = QAction(locator_filter.service.name, self.iface.mainWindow())
@@ -90,9 +94,6 @@ class GeomapfishLocatorPlugin(QObject):
         self.iface.registerLocatorFilter(locator_filter)
         self.locator_filters.append(locator_filter)
         self.save_services()
-
-    def initGui(self):
-        pass
 
     def unload(self):
         for menu_action in self.menu_actions:

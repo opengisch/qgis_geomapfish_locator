@@ -23,14 +23,14 @@ import re
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtCore import QUrl, QUrlQuery, QTimer, pyqtSlot, pyqtSignal
+from qgis.PyQt.QtCore import QUrl, QUrlQuery, QTimer, pyqtSlot, pyqtSignal, QByteArray
+from qgis.PyQt.QtNetwork import QNetworkRequest
 
 from qgis.core import Qgis, QgsMessageLog, QgsLocatorFilter, QgsLocatorResult, QgsApplication, \
-    QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, QgsGeometry, QgsWkbTypes
+    QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, QgsGeometry, QgsWkbTypes, QgsBlockingNetworkRequest
 from qgis.gui import QgsRubberBand, QgisInterface
 from osgeo import ogr
 
-from geomapfish_locator.core.network_access_manager import NetworkAccessManager, RequestsException, RequestsExceptionUserAbort
 from geomapfish_locator.core.service import Service
 from geomapfish_locator.core.utils import slugify
 from geomapfish_locator.gui.filter_configuration_dialog import FilterConfigurationDialog
@@ -108,7 +108,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         for key, value in params.items():
             q.addQueryItem(key, value)
         url.setQuery(q)
-        return url.url()
+        return url
 
     def emit_bad_configuration(self, err=None):
         result = QgsLocatorResult()
@@ -131,57 +131,41 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
             self.current_timer = None
 
     def fetchResults(self, search, context, feedback):
+        self.dbg_info("start GMF locator search...")
+        url = self.service.url
+        if not url:
+            self.emit_bad_configuration()
+            return
+        if len(search) < 2:
+            return
+
+        params = {
+            'query': search,
+            'limit': str(self.service.total_limit),
+            'partitionlimit': str(self.service.category_limit)
+        }
+        url = self.url_with_param(url, params)
+        self.dbg_info(url.url())
+
+        _request = QNetworkRequest(url)
+        _request.setRawHeader(b'User-Agent', self.USER_AGENT)
+        request = QgsBlockingNetworkRequest()
+        if self.service.authid:
+            request.setAuthCfg(self.service.authid)
+
+        response = request.get(_request, False, feedback)
+        if response == QgsBlockingNetworkRequest.NoError:
+            self.handle_response(request.reply().content())
+        else:
+            error_msg = request.reply().errorString()
+            self.emit_bad_configuration(error_msg)
+            self.info(error_msg, Qgis.Critical)
+        self.finished.emit()
+
+    def handle_response(self, content: QByteArray):
         try:
-            self.dbg_info("start GMF locator search...")
-
-            url = self.service.url
-
-            if url == "":
-                self.emit_bad_configuration()
-                return
-
-            params = {
-                'query': search,
-                'limit': str(self.service.total_limit),
-                'partitionlimit': str(self.service.category_limit)
-            }
-
-            if len(search) < 2:
-                return
-
-            headers = {b'User-Agent': self.USER_AGENT}
-
-            url = self.url_with_param(url, params)
-            self.dbg_info(url)
-
-            nam = NetworkAccessManager(self.service.authid)
-            feedback.canceled.connect(nam.abort)
-            (response, content) = nam.request(url, headers=headers, blocking=True)
-            self.handle_response(response, content)
-
-        except RequestsExceptionUserAbort:
-            pass
-        except RequestsException as err:
-            self.emit_bad_configuration(str(err))
-            self.info(err)
-        except Exception as e:
-            self.info(str(e), Qgis.Critical)
-            #exc_type, exc_obj, exc_traceback = sys.exc_info()
-            #filename = os.path.split(exc_traceback.tb_frame.f_code.co_filename)[1]
-            #self.info('{} {} {}'.format(exc_type, filename, exc_traceback.tb_lineno), Qgis.Critical)
-            #self.info(traceback.print_exception(exc_type, exc_obj, exc_traceback), Qgis.Critical)
-
-        finally:
-            self.finished.emit()
-
-    def handle_response(self, response, content):
-        try:
-            if response.status_code != 200:
-                self.info("Error with status code: {}".format(response.status_code))
-                return
-
-            data = json.loads(content.decode('utf-8'))
-            #self.dbg_info(data)
+            data = json.loads(str(content.data(), encoding='utf-8'))
+            # self.dbg_info(data)
 
             features = data['features']
             for f in features:
@@ -200,25 +184,22 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
                 result = QgsLocatorResult()
                 result.filter = self
                 result.displayString = f['properties']['label']
-                if Qgis.QGIS_VERSION_INT >= 30100:
-                    result.group = self.beautify_group(f['properties']['layer_name'])
+                result.group = self.beautify_group(f['properties']['layer_name'])
                 result.userData = geometry
                 self.resultFetched.emit(result)
 
         except Exception as e:
             self.info(str(e), Qgis.Critical)
-            #exc_type, exc_obj, exc_traceback = sys.exc_info()
-            #filename = os.path.split(exc_traceback.tb_frame.f_code.co_filename)[1]
-            #self.info('{} {} {}'.format(exc_type, filename, exc_traceback.tb_lineno), Qgis.Critical)
+            # exc_type, exc_obj, exc_traceback = sys.exc_info()
+            # #filename = os.path.split(exc_traceback.tb_frame.f_code.co_filename)[1]
+            # #self.info('{} {} {}'.format(exc_type, filename, exc_traceback.tb_lineno), Qgis.Critical)
             # self.info(traceback.print_exception(exc_type, exc_obj, exc_traceback), Qgis.Critical)
 
     def triggerResult(self, result):
         self.clear_results()
         if result.userData == FilterNotConfigured:
             self.openConfigWidget()
-            if self.iface and hasattr(self.iface, 'invalidateLocatorResults'):
-                # from QGIS 3.2 iface has invalidateLocatorResults
-                self.iface.invalidateLocatorResults()
+            self.iface.invalidateLocatorResults()
             return
 
         # this should be run in the main thread, i.e. mapCanvas should not be None

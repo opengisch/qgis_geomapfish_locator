@@ -1,7 +1,7 @@
 
 [general]
 name=Geomapfish Locator
-qgisMinimumVersion=3.4
+qgisMinimumVersion=3.6
 description=A locator filter for Geomapfish services
 version=dev
 author=Denis Rouzaud
