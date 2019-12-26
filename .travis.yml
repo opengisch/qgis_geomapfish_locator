@@ -1,5 +1,7 @@
 language: python
 
+dist: bionic
+
 python:
   - 3.7
 
@@ -7,7 +9,6 @@ git:
   submodules: false
 
 before_install:
-  - sudo apt-get -y install libqt5xml5 # fix missing packages
   # cannot use SSH to fetch submodule
   - sed -i 's#git@github.com:#https://github.com/#' .gitmodules
   - git submodule update --init --recursive
