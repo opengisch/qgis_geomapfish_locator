@@ -26,6 +26,8 @@ from geomapfish_locator.core.locator_filter import GeomapfishLocatorFilter
 from geomapfish_locator.core.old_version_import import old_version_import
 from geomapfish_locator.core.settings import Settings
 from geomapfish_locator.core.service import Service
+from geomapfish_locator.core.utils import info
+from geomapfish_locator.gui.filter_configuration_dialog import FilterConfigurationDialog
 
 DEBUG = True
 
@@ -40,6 +42,7 @@ class GeomapfishLocatorPlugin(QObject):
         self.locator_filters = []
         self.settings = Settings()
         menu_action = QAction(QCoreApplication.translate('Geomapfish', 'Add new service'), self.iface.mainWindow())
+        menu_action.triggered.connect(self.new_service)
         self.iface.addPluginToMenu(self.plugin_name, menu_action)
         self.menu_actions = [menu_action]
 
@@ -63,7 +66,20 @@ class GeomapfishLocatorPlugin(QObject):
         self.iface.addPluginToMenu(self.plugin_name, action)
         self.menu_actions.append(action)
 
+    def new_service(self):
+        service = Service()
+        dlg = FilterConfigurationDialog(service)
+        if dlg.exec_():
+            if not dlg.service.is_valid():
+                info("Service {}({}) is not valid".format(service.name, service.url))
+            else:
+                self.add_service(dlg.service.clone())
+
     def add_service(self, service):
+        if not service.is_valid():
+            info("Service {}({}) is not valid".format(service.name, service.url))
+            return
+
         for locator_filter in self.locator_filters:
             if service.name == locator_filter.service.name:
                 service.name = QCoreApplication.translate('Geomapfish', '{service} copy'.format(service=service.name))

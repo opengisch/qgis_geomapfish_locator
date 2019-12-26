@@ -21,11 +21,11 @@ import copy
 
 
 class Service:
-    def __init__(self, definition: dict):
-        self.name = definition['name']
-        self.url = definition['url']
-        self.crs = definition['crs']
-        self.authid = definition['authid']
+    def __init__(self, definition: dict = {}):
+        self.name = definition.get('name')
+        self.url = definition.get('url')
+        self.crs = definition.get('crs')
+        self.authid = definition.get('authid')
 
         self.category_limit = definition.get('category_limit', 8)
         self.total_limit = definition.get('total_limit', 40)
@@ -34,6 +34,11 @@ class Service:
         self.remove_leading_digits = definition.get('remove_leading_digits', True)
         self.replace_underscore = definition.get('replace_underscore', True)
         self.break_camelcase = definition.get('break_camelcase', True)
+
+    def is_valid(self):
+        if not self.name or not self.url or not self.crs:
+            return False
+        return True
 
     def clone(self):
         return copy.deepcopy(self)
