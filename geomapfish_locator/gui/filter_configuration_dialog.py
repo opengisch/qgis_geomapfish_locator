@@ -30,7 +30,7 @@ from qgis.core import QgsCoordinateReferenceSystem
 from qgis.PyQt.QtWidgets import QDialog
 from qgis.PyQt.uic import loadUiType
 
-DialogUi, _ = loadUiType(os.path.join(os.path.dirname(__file__), '../ui/config.ui'))
+DialogUi, _ = loadUiType(os.path.join(os.path.dirname(__file__), '../ui/filter_configuration.ui'))
 
 
 class FilterConfigurationDialog(QDialog, DialogUi):
