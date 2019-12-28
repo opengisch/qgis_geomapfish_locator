@@ -27,6 +27,7 @@ from geomapfish_locator.core.old_version_import import old_version_import
 from geomapfish_locator.core.settings import Settings
 from geomapfish_locator.core.service import Service
 from geomapfish_locator.core.utils import info
+from geomapfish_locator.gui.geomapfish_settings_dialog import GeomapfishSettingsDialog
 from geomapfish_locator.gui.filter_configuration_dialog import FilterConfigurationDialog
 
 DEBUG = True
@@ -41,11 +42,13 @@ class GeomapfishLocatorPlugin(QObject):
         self.iface = iface
         self.locator_filters = []
         self.settings = Settings()
-        menu_action = QAction(QCoreApplication.translate('Geomapfish', 'Add new service'), self.iface.mainWindow())
-        menu_action.triggered.connect(self.new_service)
-        self.iface.addPluginToMenu(self.plugin_name, menu_action)
-        self.iface.pluginMenu()
-        self.menu_actions = [menu_action]
+        menu_action_new = QAction(QCoreApplication.translate('Geomapfish', 'Add new service'), self.iface.mainWindow())
+        menu_action_new.triggered.connect(self.new_service)
+        self.iface.addPluginToMenu(self.plugin_name, menu_action_new)
+        menu_action_settings = QAction(QCoreApplication.translate('Geomapfish', 'Settings'), self.iface.mainWindow())
+        menu_action_settings.triggered.connect(lambda _: GeomapfishSettingsDialog(self.iface.mainWindow()).exec_())
+        self.iface.addPluginToMenu(self.plugin_name, menu_action_settings)
+        self.menu_actions = [menu_action_new, menu_action_settings]
 
         for definition in self.settings.value('services'):
             self.add_service(Service(definition))
@@ -96,6 +99,7 @@ class GeomapfishLocatorPlugin(QObject):
         self.save_services()
 
     def unload(self):
+        self.iface.invalidateLocatorResults()
         for menu_action in self.menu_actions:
             self.iface.removePluginMenu(self.plugin_name, menu_action)
         for locator_filter in self.locator_filters:

@@ -17,7 +17,7 @@
  ***************************************************************************/
  """
 
-from geomapfish_locator.qgissettingmanager import SettingManager, Scope, List
+from geomapfish_locator.qgissettingmanager import SettingManager, Scope, List, Integer
 
 pluginName = "geomapfsih_locator_plugin"
 
@@ -25,5 +25,7 @@ pluginName = "geomapfsih_locator_plugin"
 class Settings(SettingManager):
     def __init__(self):
         SettingManager.__init__(self, pluginName)
-        self.add_setting(List("services", Scope.Global, []))
+        self.add_setting(List('services', Scope.Global, []))
+
+        self.add_setting(Integer('highlight_duration', Scope.Global, 8))
 

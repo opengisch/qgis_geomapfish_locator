@@ -27,12 +27,13 @@ from qgis.PyQt.QtCore import QUrl, QUrlQuery, QTimer, pyqtSlot, pyqtSignal, QByt
 from qgis.PyQt.QtNetwork import QNetworkRequest
 
 from qgis.core import Qgis, QgsMessageLog, QgsLocatorFilter, QgsLocatorResult, QgsApplication, \
-    QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, QgsGeometry, QgsWkbTypes, QgsBlockingNetworkRequest
+    QgsCoordinateReferenceSystem, QgsGeometry, QgsWkbTypes, QgsBlockingNetworkRequest, QgsReferencedRectangle
 from qgis.gui import QgsRubberBand, QgisInterface
 from osgeo import ogr
 
 from geomapfish_locator.core.service import Service
-from geomapfish_locator.core.utils import slugify
+from geomapfish_locator.core.utils import slugify, dbg_info
+from geomapfish_locator.core.settings import Settings
 from geomapfish_locator.gui.filter_configuration_dialog import FilterConfigurationDialog
 
 DEBUG = True
@@ -55,22 +56,19 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         self.iface = None
         self.map_canvas = None
         self.current_timer = None
-        self.transform = None
+        self.crs = QgsCoordinateReferenceSystem(self.service.crs)
 
         # only get map_canvas on main thread, not when cloning
         if iface is not None:
             self.iface = iface
             self.map_canvas = iface.mapCanvas()
-            self.map_canvas.destinationCrsChanged.connect(self.create_transform)
 
             self.rubber_band = QgsRubberBand(self.map_canvas)
-            self.rubber_band.setColor(QColor(255, 255, 50, 200))
+            self.rubber_band.setColor(QColor(0, 100, 255, 200))
             self.rubber_band.setIcon(self.rubber_band.ICON_CIRCLE)
-            self.rubber_band.setIconSize(15)
+            self.rubber_band.setIconSize(20)
             self.rubber_band.setWidth(4)
             self.rubber_band.setBrushStyle(Qt.NoBrush)
-
-            self.create_transform()
 
     def name(self) -> str:
         return slugify(self.displayName())
@@ -91,15 +89,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         cfg = FilterConfigurationDialog(self.service, parent)
         if cfg.exec_():
             self.service = cfg.service.clone()
-            self.create_transform()
             self.changed.emit()
-
-    def create_transform(self):
-        srv_crs_authid = self.service.crs
-        src_crs = QgsCoordinateReferenceSystem(srv_crs_authid)
-        assert src_crs.isValid()
-        dst_crs = self.map_canvas.mapSettings().destinationCrs()
-        self.transform = QgsCoordinateTransform(src_crs, dst_crs, QgsProject.instance())
 
     @staticmethod
     def url_with_param(url, params) -> str:
@@ -204,19 +194,36 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
 
         # this should be run in the main thread, i.e. mapCanvas should not be None
         geometry = result.userData
-        geometry.transform(self.transform)
+        # geometry.transform(self.transform)
+        dbg_info(str(geometry.asWkt()))
+        dbg_info(geometry.type())
 
-        self.rubber_band.reset(geometry.type())
-        self.rubber_band.addGeometry(geometry, None)
-        rect = geometry.boundingBox()
-        rect.scale(1.5)
-        self.map_canvas.setExtent(rect)
+        try:
+            rect = QgsReferencedRectangle(geometry.boundingBox(), self.crs)
+            rect.scale(4)
+            self.map_canvas.setReferencedExtent(rect)
+        except AttributeError:
+            # QGIS < 3.10 handling
+            from qgis.core import QgsCoordinateTransform, QgsProject
+            transform = QgsCoordinateTransform(self.crs, self.map_canvas.mapSettings().destinationCrs(), QgsProject.instance())
+            geometry.transform(transform)
+            rect = geometry.boundingBox()
+            rect.scale(4)
+            self.map_canvas.setExtent(rect)
+
         self.map_canvas.refresh()
 
-        self.current_timer = QTimer()
-        self.current_timer.timeout.connect(self.clear_results)
-        self.current_timer.setSingleShot(True)
-        self.current_timer.start(5000)
+        if geometry.type() == QgsWkbTypes.PolygonGeometry:
+            nflash = 16
+            self.map_canvas.flashGeometries([geometry], self.crs, QColor(255, 255, 50, 200), QColor(255, 0, 50, 100), nflash, Settings().value('highlight_duration')/nflash*1000)
+        else:
+            self.rubber_band.reset(geometry.type())
+            self.rubber_band.addGeometry(geometry, self.crs)
+
+            self.current_timer = QTimer()
+            self.current_timer.timeout.connect(self.clear_results)
+            self.current_timer.setSingleShot(True)
+            self.current_timer.start(Settings().value('highlight_duration')*1000)
 
     def beautify_group(self, group) -> str:
         if self.service.remove_leading_digits:
