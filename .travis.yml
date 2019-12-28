@@ -23,7 +23,7 @@ jobs:
   include:
     - stage: push-translation
       if: branch = master AND type != pull_request
-      script: LD_LIBRARY_PATH=/home/travis/virtualenv/python3.7.5/lib/python3.7/site-packages/PyQt5/Qt/lib:$LD_LIBRARY_PATH qgis-plugin-ci push-translation ${TX_TOKEN}
+      script: LD_LIBRARY_PATH=/home/travis/virtualenv/python$(python3 --version | cut -d ' ' -f2)/lib/python${TRAVIS_PYTHON_VERSION}/site-packages/PyQt5/Qt/lib:$LD_LIBRARY_PATH qgis-plugin-ci push-translation ${TX_TOKEN}
 
     - stage: deploy
       if: tag IS present AND type != pull_request
