@@ -51,7 +51,7 @@ def old_version_import() -> Service:
                 QCoreApplication.translate(
                     "Geomapfish Locator",
                     "User and password were saved in clear text in former Geomapfish plugin. "
-                    "Would you like to use QGIS authentification to store these credentials? "
+                    "Would you like to use QGIS authentication to store these credentials? "
                     "If not, they will be removed."
                 )
             )
