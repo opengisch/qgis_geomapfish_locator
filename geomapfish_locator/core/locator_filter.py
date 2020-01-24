@@ -52,10 +52,11 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
     def __init__(self, service: Service, iface: QgisInterface = None):
         super().__init__()
         self.service = service.clone()
-        self.rubber_band = None
+        self.rubberband = None
         self.iface = None
         self.map_canvas = None
         self.current_timer = None
+        self.settings = Settings()
         self.crs = QgsCoordinateReferenceSystem(self.service.crs)
 
         # only get map_canvas on main thread, not when cloning
@@ -63,12 +64,8 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
             self.iface = iface
             self.map_canvas = iface.mapCanvas()
 
-            self.rubber_band = QgsRubberBand(self.map_canvas)
-            self.rubber_band.setColor(QColor(0, 100, 255, 200))
-            self.rubber_band.setIcon(self.rubber_band.ICON_CIRCLE)
-            self.rubber_band.setIconSize(20)
-            self.rubber_band.setWidth(4)
-            self.rubber_band.setBrushStyle(Qt.NoBrush)
+            self.rubberband = QgsRubberBand(self.map_canvas)
+            self.reset_rubberband()
 
     def name(self) -> str:
         return slugify(self.displayName())
@@ -91,6 +88,14 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
             self.service = cfg.service.clone()
             self.changed.emit()
 
+    def reset_rubberband(self):
+        # this should happen on main thread only!
+        self.rubberband.setColor(self.settings.value('point_color'))
+        self.rubberband.setIcon(self.rubberband.ICON_CIRCLE)
+        self.rubberband.setIconSize(self.settings.value('point_size'))
+        self.rubberband.setWidth(self.settings.value('line_width'))
+        self.rubberband.setBrushStyle(Qt.NoBrush)
+
     @staticmethod
     def url_with_param(url, params) -> str:
         url = QUrl(url)
@@ -112,8 +117,8 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
 
     @pyqtSlot()
     def clear_results(self):
-        if self.rubber_band:
-            self.rubber_band.reset(QgsWkbTypes.PointGeometry)
+        if self.rubberband:
+            self.rubberband.reset(QgsWkbTypes.PointGeometry)
         if self.current_timer is not None:
             self.current_timer.timeout.disconnect(self.clear_results)
             self.current_timer.stop()
@@ -215,15 +220,19 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
 
         if geometry.type() == QgsWkbTypes.PolygonGeometry:
             nflash = 16
-            self.map_canvas.flashGeometries([geometry], self.crs, QColor(255, 255, 50, 200), QColor(255, 0, 50, 100), nflash, Settings().value('highlight_duration')/nflash*1000)
+            color1: QColor = self.settings.value('polygon_color')
+            color2 = color1
+            color1.setAlpha(200)
+            color2.setAlpha(100)
+            self.map_canvas.flashGeometries([geometry], self.crs, color1, color2, nflash, self.settings.value('highlight_duration')/nflash*1000)
         else:
-            self.rubber_band.reset(geometry.type())
-            self.rubber_band.addGeometry(geometry, self.crs)
+            self.rubberband.reset(geometry.type())
+            self.rubberband.addGeometry(geometry, self.crs)
 
             self.current_timer = QTimer()
             self.current_timer.timeout.connect(self.clear_results)
             self.current_timer.setSingleShot(True)
-            self.current_timer.start(Settings().value('highlight_duration')*1000)
+            self.current_timer.start(self.settings.value('highlight_duration')*1000)
 
     def beautify_group(self, group) -> str:
         if self.service.remove_leading_digits:

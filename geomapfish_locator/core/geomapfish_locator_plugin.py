@@ -46,7 +46,7 @@ class GeomapfishLocatorPlugin(QObject):
         menu_action_new.triggered.connect(self.new_service)
         self.iface.addPluginToMenu(self.plugin_name, menu_action_new)
         menu_action_settings = QAction(QCoreApplication.translate('Geomapfish', 'Settings'), self.iface.mainWindow())
-        menu_action_settings.triggered.connect(lambda _: GeomapfishSettingsDialog(self.iface.mainWindow()).exec_())
+        menu_action_settings.triggered.connect(self.show_settings)
         self.iface.addPluginToMenu(self.plugin_name, menu_action_settings)
         self.menu_actions = [menu_action_new, menu_action_settings]
 
@@ -116,6 +116,11 @@ class GeomapfishLocatorPlugin(QObject):
             self.iface.removePluginMenu(self.plugin_name, menu_action)
         for locator_filter in self.locator_filters:
             self.add_locator_menu_action(locator_filter)
+
+    def show_settings(self, _):
+        if GeomapfishSettingsDialog(self.iface.mainWindow()).exec_():
+            for locator_filter in self.locator_filters:
+                locator_filter.reset_rubberband()
 
     @pyqtSlot()
     def filter_changed(self):
