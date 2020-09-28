@@ -20,7 +20,7 @@
 
 import os
 from qgis.PyQt.QtCore import QCoreApplication, QLocale, QSettings, QTranslator, pyqtSlot, QObject
-from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.QtWidgets import QAction, QMenu, QMessageBox
 from qgis.gui import QgisInterface
 from geomapfish_locator.core.locator_filter import GeomapfishLocatorFilter
 from geomapfish_locator.core.old_version_import import old_version_import
@@ -68,10 +68,13 @@ class GeomapfishLocatorPlugin(QObject):
         pass
 
     def add_locator_menu_action(self, locator_filter: GeomapfishLocatorFilter):
-        action = QAction(locator_filter.service.name, self.iface.mainWindow())
-        action.triggered.connect(lambda _: locator_filter.openConfigWidget())
-        self.iface.addPluginToMenu(self.plugin_name, action)
-        self.menu_actions.append(action)
+        menu = QMenu(locator_filter.service.name, self.iface.mainWindow())
+        edit_action = menu.addAction(self.tr('edit'))
+        edit_action.triggered.connect(lambda _: locator_filter.openConfigWidget())
+        remove_action = menu.addAction(self.tr('remove'))
+        remove_action.triggered.connect(lambda _: GeomapfishLocatorPlugin.remove_service(self, locator_filter, menu.menuAction()))
+        self.iface.addPluginToMenu(self.plugin_name, menu.menuAction())
+        self.menu_actions.append(menu.menuAction())
 
     def new_service(self):
         service = Service()
@@ -97,6 +100,18 @@ class GeomapfishLocatorPlugin(QObject):
         self.iface.registerLocatorFilter(locator_filter)
         self.locator_filters.append(locator_filter)
         self.save_services()
+
+    def remove_service(self, locator_filter, menu):
+        reply = QMessageBox.question(
+            self.iface.mainWindow(), self.plugin_name,
+            self.tr('Are you sure to remove service "{}"'.format(locator_filter.service.name)),
+            QMessageBox.Yes, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.iface.removePluginMenu(self.plugin_name, menu)
+            self.menu_actions.remove(menu)
+            self.iface.deregisterLocatorFilter(locator_filter)
+            self.locator_filters.remove(locator_filter)
+            self.save_services()
 
     def unload(self):
         self.iface.invalidateLocatorResults()
