@@ -86,6 +86,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         cfg = FilterConfigurationDialog(self.service, parent)
         if cfg.exec_():
             self.service = cfg.service.clone()
+            self.crs = QgsCoordinateReferenceSystem(self.service.c
             self.changed.emit()
 
     def reset_rubberband(self):
