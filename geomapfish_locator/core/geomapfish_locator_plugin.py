@@ -117,8 +117,10 @@ class GeomapfishLocatorPlugin(QObject):
         self.iface.invalidateLocatorResults()
         for menu_action in self.menu_actions:
             self.iface.removePluginMenu(self.plugin_name, menu_action)
+        del self.menu_actions[:]
         for locator_filter in self.locator_filters:
             self.iface.deregisterLocatorFilter(locator_filter)
+        self.locator_filters = {}
 
     def save_services(self):
         services = []
@@ -129,8 +131,10 @@ class GeomapfishLocatorPlugin(QObject):
     def refresh_menu(self):
         for menu_action in self.menu_actions[1:]:
             self.iface.removePluginMenu(self.plugin_name, menu_action)
-        for locator_filter in self.locator_filters:
-            self.add_locator_menu_action(locator_filter)
+        del self.menu_actions[1:]
+        # use index based loop to avoid changing the variable used in the lambda !
+        for i in range(len(self.locator_filters)):
+            self.add_locator_menu_action(self.locator_filters[i])
 
     def show_settings(self, _):
         if GeomapfishSettingsDialog(self.iface.mainWindow()).exec_():
