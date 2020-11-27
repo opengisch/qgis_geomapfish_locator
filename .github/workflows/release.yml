@@ -11,6 +11,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: checkout submodules
+      run: |
+        sed -i 's#git@github.com:#https://github.com/#' .gitmodules
+        git submodule update --init --recursive
+        sed -i 's#https://github.com/#git@github.com:#' .gitmodules
+
     - name: Set up Python 3.8
       uses: actions/setup-python@v1
       with:
