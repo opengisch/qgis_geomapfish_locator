@@ -27,16 +27,6 @@ jobs:
       if: branch = master AND type != pull_request
       script: LD_LIBRARY_PATH=/home/travis/virtualenv/python$(python3 --version | cut -d ' ' -f2)/lib/python${TRAVIS_PYTHON_VERSION}/site-packages/PyQt5/Qt/lib:$LD_LIBRARY_PATH qgis-plugin-ci push-translation ${TX_TOKEN}
 
-    - stage: deploy
-      if: tag IS present AND type != pull_request
-      script:
-        - >
-          qgis-plugin-ci release ${TRAVIS_TAG}
-          --transifex-token ${TX_TOKEN}
-          --github-token ${GH_TOKEN}
-          --osgeo-username 3nids
-          --osgeo-password ${OSGEO_PASSWORD}
-
 env:
   global:
     - OSGEO_USERNAME=3nids
