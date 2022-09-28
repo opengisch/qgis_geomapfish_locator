@@ -58,7 +58,9 @@ class GeomapfishLocatorPlugin(QObject):
             self.add_service(import_service)
 
         # initialize translation
-        qgis_locale = QLocale(QSettings().value('locale/userLocale'))
+        qgis_locale = QLocale(
+            str(QSettings().value("locale/userLocale")).replace(str(NULL), "en_CH")
+        )
         locale_path = os.path.join(os.path.dirname(__file__), 'i18n')
         self.translator = QTranslator()
         self.translator.load(qgis_locale, 'geomapfish_locator', '_', locale_path)
