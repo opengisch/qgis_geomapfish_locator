@@ -21,6 +21,7 @@
 import os
 from qgis.PyQt.QtCore import QCoreApplication, QLocale, QSettings, QTranslator, pyqtSlot, QObject
 from qgis.PyQt.QtWidgets import QAction, QMenu, QMessageBox
+from qgis.core import NULL
 from qgis.gui import QgisInterface
 from geomapfish_locator.core.locator_filter import GeomapfishLocatorFilter
 from geomapfish_locator.core.old_version_import import old_version_import
