@@ -29,7 +29,7 @@ PLUGIN_NAME = "Geomapfish Locator Filters"
 
 def info(message: str, level: Qgis.MessageLevel = Qgis.Info):
     QgsMessageLog.logMessage("{}: {}".format(PLUGIN_NAME, message), "Locator bar", level)
-    iface.messageBar().pushMessage('SoLocator', message, level)
+    iface.messageBar().pushMessage('Geomapfish Locator', message, level)
 
 
 def dbg_info(message: str):
