@@ -13,6 +13,6 @@ Validate and start searching in the locator bar at the bottom left of the applic
 
 ## Advanced configuration
 
-Each service will create its own locator filter. All the filters can be seen under the locator settings 
+Each service will create its own locator filter. All the filters can be seen under the locator settings
 (in `Settings` -> `Options` -> `Locator`) and can be configured from there, including the prefix configuration.
 If you want to avoid typing the prefix of the filter (`gmf`), enable the filter by default.

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------
 #
 # QGIS Geomapfish Locator Plugin
@@ -29,12 +28,10 @@ import os
 from qgis.PyQt.QtWidgets import QDialog
 from qgis.PyQt.uic import loadUiType
 
+from geomapfish_locator.core.settings import Settings
 from geomapfish_locator.qgissettingmanager import SettingDialog, UpdateMode
 
-from geomapfish_locator.core.settings import Settings
-
-
-DialogUi, _ = loadUiType(os.path.join(os.path.dirname(__file__), '../ui/geomapfish_settings.ui'))
+DialogUi, _ = loadUiType(os.path.join(os.path.dirname(__file__), "../ui/geomapfish_settings.ui"))
 
 
 class GeomapfishSettingsDialog(QDialog, DialogUi, SettingDialog):

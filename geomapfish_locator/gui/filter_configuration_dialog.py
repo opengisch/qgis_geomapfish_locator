@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------
 #
 # QGIS Geomapfish Locator Plugin
@@ -26,11 +25,12 @@
 
 
 import os
+
 from qgis.core import QgsCoordinateReferenceSystem
 from qgis.PyQt.QtWidgets import QDialog
 from qgis.PyQt.uic import loadUiType
 
-DialogUi, _ = loadUiType(os.path.join(os.path.dirname(__file__), '../ui/filter_configuration.ui'))
+DialogUi, _ = loadUiType(os.path.join(os.path.dirname(__file__), "../ui/filter_configuration.ui"))
 
 
 class FilterConfigurationDialog(QDialog, DialogUi):
@@ -41,7 +41,7 @@ class FilterConfigurationDialog(QDialog, DialogUi):
         self.service = service.clone()
 
         self.accepted.connect(self.save_service)
-        
+
         self.name.setText(service.name)
         self.crs.setCrs(QgsCoordinateReferenceSystem(service.crs))
         self.url.setText(service.url)
@@ -66,5 +66,3 @@ class FilterConfigurationDialog(QDialog, DialogUi):
 
         self.service.category_limit = self.category_limit.value()
         self.service.total_limit = self.total_limit.value()
-
-

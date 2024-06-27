@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------
 #
 # QGIS Geomapfish Locator Plugin
@@ -32,5 +31,8 @@ def classFactory(iface):
     :type iface: QgsInterface
     """
     #
-    from geomapfish_locator.core.geomapfish_locator_plugin import GeomapfishLocatorPlugin
+    from geomapfish_locator.core.geomapfish_locator_plugin import (
+        GeomapfishLocatorPlugin,
+    )
+
     return GeomapfishLocatorPlugin(iface)

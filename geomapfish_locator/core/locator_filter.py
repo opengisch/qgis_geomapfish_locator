@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
 
@@ -17,23 +16,38 @@
  ***************************************************************************/
  """
 
-
 import json
 import re
 
-from qgis.PyQt.QtCore import Qt
+from osgeo import ogr
+from qgis.core import (
+    Qgis,
+    QgsApplication,
+    QgsBlockingNetworkRequest,
+    QgsCoordinateReferenceSystem,
+    QgsGeometry,
+    QgsLocatorFilter,
+    QgsLocatorResult,
+    QgsMessageLog,
+    QgsReferencedRectangle,
+    QgsWkbTypes,
+)
+from qgis.gui import QgisInterface, QgsRubberBand
+from qgis.PyQt.QtCore import (
+    QByteArray,
+    Qt,
+    QTimer,
+    QUrl,
+    QUrlQuery,
+    pyqtSignal,
+    pyqtSlot,
+)
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtCore import QUrl, QUrlQuery, QTimer, pyqtSlot, pyqtSignal, QByteArray
 from qgis.PyQt.QtNetwork import QNetworkRequest
 
-from qgis.core import Qgis, QgsMessageLog, QgsLocatorFilter, QgsLocatorResult, QgsApplication, \
-    QgsCoordinateReferenceSystem, QgsGeometry, QgsWkbTypes, QgsBlockingNetworkRequest, QgsReferencedRectangle
-from qgis.gui import QgsRubberBand, QgisInterface
-from osgeo import ogr
-
 from geomapfish_locator.core.service import Service
-from geomapfish_locator.core.utils import slugify, dbg_info
 from geomapfish_locator.core.settings import Settings
+from geomapfish_locator.core.utils import dbg_info, slugify
 from geomapfish_locator.gui.filter_configuration_dialog import FilterConfigurationDialog
 
 DEBUG = True
@@ -45,7 +59,7 @@ class FilterNotConfigured:
 
 class GeomapfishLocatorFilter(QgsLocatorFilter):
 
-    USER_AGENT = b'Mozilla/5.0 QGIS GeoMapFish Locator Filter'
+    USER_AGENT = b"Mozilla/5.0 QGIS GeoMapFish Locator Filter"
 
     changed = pyqtSignal()
 
@@ -77,7 +91,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         return self.service.name
 
     def prefix(self) -> str:
-        return 'gmf'
+        return "gmf"
 
     def hasConfigWidget(self) -> bool:
         return True
@@ -91,10 +105,10 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
 
     def reset_rubberband(self):
         # this should happen on main thread only!
-        self.rubberband.setColor(self.settings.value('point_color'))
+        self.rubberband.setColor(self.settings.value("point_color"))
         self.rubberband.setIcon(self.rubberband.ICON_CIRCLE)
-        self.rubberband.setIconSize(self.settings.value('point_size'))
-        self.rubberband.setWidth(self.settings.value('line_width'))
+        self.rubberband.setIconSize(self.settings.value("point_size"))
+        self.rubberband.setWidth(self.settings.value("line_width"))
         self.rubberband.setBrushStyle(Qt.NoBrush)
 
     @staticmethod
@@ -109,10 +123,10 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
     def emit_bad_configuration(self, err=None):
         result = QgsLocatorResult()
         result.filter = self
-        result.displayString = self.tr('Locator filter is not configured.')
-        result.description = err if err else self.tr('Double-click to configure it.')
+        result.displayString = self.tr("Locator filter is not configured.")
+        result.description = err if err else self.tr("Double-click to configure it.")
         result.userData = FilterNotConfigured
-        result.icon = QgsApplication.getThemeIcon('mIconWarning.svg')
+        result.icon = QgsApplication.getThemeIcon("mIconWarning.svg")
         self.resultFetched.emit(result)
         return
 
@@ -136,15 +150,15 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
             return
 
         params = {
-            'query': search,
-            'limit': str(self.service.total_limit),
-            'partitionlimit': str(self.service.category_limit)
+            "query": search,
+            "limit": str(self.service.total_limit),
+            "partitionlimit": str(self.service.category_limit),
         }
         url = self.url_with_param(url, params)
         self.dbg_info(url.url())
 
         _request = QNetworkRequest(url)
-        _request.setRawHeader(b'User-Agent', self.USER_AGENT)
+        _request.setRawHeader(b"User-Agent", self.USER_AGENT)
         request = QgsBlockingNetworkRequest()
         if self.service.authid:
             request.setAuthCfg(self.service.authid)
@@ -160,27 +174,29 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
 
     def handle_response(self, content: QByteArray):
         try:
-            data = json.loads(str(content.data(), encoding='utf-8'))
+            data = json.loads(str(content.data(), encoding="utf-8"))
             # self.dbg_info(data)
 
-            features = data['features']
+            features = data["features"]
             for f in features:
-                json_geom = json.dumps(f['geometry'])
+                json_geom = json.dumps(f["geometry"])
                 ogr_geom = ogr.CreateGeometryFromJson(json_geom)
                 wkt = ogr_geom.ExportToWkt()
                 geometry = QgsGeometry.fromWkt(wkt)
-                self.dbg_info('---------')
+                self.dbg_info("---------")
                 self.dbg_info(QgsWkbTypes.geometryDisplayString(geometry.type()))
                 self.dbg_info(f.keys())
-                self.dbg_info('{} {}'.format(f['properties']['layer_name'], f['properties']['label']))
-                self.dbg_info(f['bbox'])
-                self.dbg_info(f['geometry'])
+                self.dbg_info(
+                    "{} {}".format(f["properties"]["layer_name"], f["properties"]["label"])
+                )
+                self.dbg_info(f["bbox"])
+                self.dbg_info(f["geometry"])
                 if geometry is None:
                     continue
                 result = QgsLocatorResult()
                 result.filter = self
-                result.displayString = f['properties']['label']
-                result.group = self.beautify_group(f['properties']['layer_name'])
+                result.displayString = f["properties"]["label"]
+                result.group = self.beautify_group(f["properties"]["layer_name"])
                 result.userData = geometry
                 self.resultFetched.emit(result)
 
@@ -211,7 +227,10 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         except AttributeError:
             # QGIS < 3.10 handling
             from qgis.core import QgsCoordinateTransform, QgsProject
-            transform = QgsCoordinateTransform(self.crs, self.map_canvas.mapSettings().destinationCrs(), QgsProject.instance())
+
+            transform = QgsCoordinateTransform(
+                self.crs, self.map_canvas.mapSettings().destinationCrs(), QgsProject.instance()
+            )
             geometry.transform(transform)
             rect = geometry.boundingBox()
             rect.scale(4)
@@ -221,11 +240,18 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
 
         if geometry.type() == QgsWkbTypes.PolygonGeometry:
             nflash = 16
-            color1: QColor = self.settings.value('polygon_color')
+            color1: QColor = self.settings.value("polygon_color")
             color2 = color1
             color1.setAlpha(200)
             color2.setAlpha(100)
-            self.map_canvas.flashGeometries([geometry], self.crs, color1, color2, nflash, self.settings.value('highlight_duration')/nflash*1000)
+            self.map_canvas.flashGeometries(
+                [geometry],
+                self.crs,
+                color1,
+                color2,
+                nflash,
+                self.settings.value("highlight_duration") / nflash * 1000,
+            )
         else:
             self.rubberband.reset(geometry.type())
             self.rubberband.addGeometry(geometry, self.crs)
@@ -233,11 +259,11 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
             self.current_timer = QTimer()
             self.current_timer.timeout.connect(self.clear_results)
             self.current_timer.setSingleShot(True)
-            self.current_timer.start(self.settings.value('highlight_duration')*1000)
+            self.current_timer.start(self.settings.value("highlight_duration") * 1000)
 
     def beautify_group(self, group) -> str:
         if self.service.remove_leading_digits:
-            group = re.sub('^[0-9]+', '', group)
+            group = re.sub("^[0-9]+", "", group)
         if self.service.replace_underscore:
             group = group.replace("_", " ")
         if self.service.break_camelcase:
@@ -245,7 +271,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
         return group
 
     def info(self, msg="", level=Qgis.Info):
-        QgsMessageLog.logMessage('{} {}'.format(self.__class__.__name__, msg), 'QgsLocatorFilter', level)
+        QgsMessageLog.logMessage(f"{self.__class__.__name__} {msg}", "QgsLocatorFilter", level)
 
     def dbg_info(self, msg=""):
         if DEBUG:
@@ -253,6 +279,5 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
 
     @staticmethod
     def break_camelcase(identifier) -> str:
-        matches = re.finditer('.+?(?:(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|$)', identifier)
-        return ' '.join([m.group(0) for m in matches])
-
+        matches = re.finditer(".+?(?:(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|$)", identifier)
+        return " ".join([m.group(0) for m in matches])

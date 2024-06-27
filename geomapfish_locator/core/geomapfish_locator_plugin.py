@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
 
@@ -17,19 +16,27 @@
  ***************************************************************************/
  """
 
-
 import os
-from qgis.PyQt.QtCore import QCoreApplication, QLocale, QSettings, QTranslator, pyqtSlot, QObject
-from qgis.PyQt.QtWidgets import QAction, QMenu, QMessageBox
+
 from qgis.core import NULL
 from qgis.gui import QgisInterface
+from qgis.PyQt.QtCore import (
+    QCoreApplication,
+    QLocale,
+    QObject,
+    QSettings,
+    QTranslator,
+    pyqtSlot,
+)
+from qgis.PyQt.QtWidgets import QAction, QMenu, QMessageBox
+
 from geomapfish_locator.core.locator_filter import GeomapfishLocatorFilter
 from geomapfish_locator.core.old_version_import import old_version_import
-from geomapfish_locator.core.settings import Settings
 from geomapfish_locator.core.service import Service
+from geomapfish_locator.core.settings import Settings
 from geomapfish_locator.core.utils import info
-from geomapfish_locator.gui.geomapfish_settings_dialog import GeomapfishSettingsDialog
 from geomapfish_locator.gui.filter_configuration_dialog import FilterConfigurationDialog
+from geomapfish_locator.gui.geomapfish_settings_dialog import GeomapfishSettingsDialog
 
 DEBUG = True
 
@@ -43,15 +50,19 @@ class GeomapfishLocatorPlugin(QObject):
         self.iface = iface
         self.locator_filters = []
         self.settings = Settings()
-        menu_action_new = QAction(QCoreApplication.translate('Geomapfish', 'Add new service'), self.iface.mainWindow())
+        menu_action_new = QAction(
+            QCoreApplication.translate("Geomapfish", "Add new service"), self.iface.mainWindow()
+        )
         menu_action_new.triggered.connect(self.new_service)
         self.iface.addPluginToMenu(self.plugin_name, menu_action_new)
-        menu_action_settings = QAction(QCoreApplication.translate('Geomapfish', 'Settings'), self.iface.mainWindow())
+        menu_action_settings = QAction(
+            QCoreApplication.translate("Geomapfish", "Settings"), self.iface.mainWindow()
+        )
         menu_action_settings.triggered.connect(self.show_settings)
         self.iface.addPluginToMenu(self.plugin_name, menu_action_settings)
         self.menu_entries = [menu_action_new, menu_action_settings]
 
-        for definition in self.settings.value('services'):
+        for definition in self.settings.value("services"):
             self.add_service(Service(definition))
 
         import_service = old_version_import()
@@ -62,9 +73,9 @@ class GeomapfishLocatorPlugin(QObject):
         qgis_locale = QLocale(
             str(QSettings().value("locale/userLocale")).replace(str(NULL), "en_CH")
         )
-        locale_path = os.path.join(os.path.dirname(__file__), 'i18n')
+        locale_path = os.path.join(os.path.dirname(__file__), "i18n")
         self.translator = QTranslator()
-        self.translator.load(qgis_locale, 'geomapfish_locator', '_', locale_path)
+        self.translator.load(qgis_locale, "geomapfish_locator", "_", locale_path)
         QCoreApplication.installTranslator(self.translator)
 
     def initGui(self):
@@ -72,10 +83,12 @@ class GeomapfishLocatorPlugin(QObject):
 
     def add_locator_menu_action(self, locator_filter: GeomapfishLocatorFilter):
         menu = QMenu(locator_filter.service.name, self.iface.mainWindow())
-        edit_action = menu.addAction(self.tr('edit'))
+        edit_action = menu.addAction(self.tr("edit"))
         edit_action.triggered.connect(lambda _: locator_filter.openConfigWidget())
-        remove_action = menu.addAction(self.tr('remove'))
-        remove_action.triggered.connect(lambda _: GeomapfishLocatorPlugin.remove_service(self, locator_filter, menu))
+        remove_action = menu.addAction(self.tr("remove"))
+        remove_action.triggered.connect(
+            lambda _: GeomapfishLocatorPlugin.remove_service(self, locator_filter, menu)
+        )
         self.iface.addPluginToMenu(self.plugin_name, menu.menuAction())
         self.menu_entries.append(menu)
 
@@ -84,18 +97,18 @@ class GeomapfishLocatorPlugin(QObject):
         dlg = FilterConfigurationDialog(service)
         if dlg.exec_():
             if not dlg.service.is_valid():
-                info("Service {}({}) is not valid".format(service.name, service.url))
+                info(f"Service {service.name}({service.url}) is not valid")
             else:
                 self.add_service(dlg.service.clone())
 
     def add_service(self, service):
         if not service.is_valid():
-            info("Service {}({}) is not valid".format(service.name, service.url))
+            info(f"Service {service.name}({service.url}) is not valid")
             return
 
         for locator_filter in self.locator_filters:
             if service.name == locator_filter.service.name:
-                service.name = QCoreApplication.translate('Geomapfish', '{service} copy'.format(service=service.name))
+                service.name = QCoreApplication.translate("Geomapfish", f"{service.name} copy")
 
         locator_filter = GeomapfishLocatorFilter(service, self.iface)
         locator_filter.changed.connect(self.filter_changed)
@@ -106,9 +119,12 @@ class GeomapfishLocatorPlugin(QObject):
 
     def remove_service(self, locator_filter, menu):
         reply = QMessageBox.question(
-            self.iface.mainWindow(), self.plugin_name,
-            self.tr('Are you sure to remove service "{}"'.format(locator_filter.service.name)),
-            QMessageBox.Yes, QMessageBox.No)
+            self.iface.mainWindow(),
+            self.plugin_name,
+            self.tr(f'Are you sure to remove service "{locator_filter.service.name}"'),
+            QMessageBox.Yes,
+            QMessageBox.No,
+        )
         if reply == QMessageBox.Yes:
             self.iface.removePluginMenu(self.plugin_name, menu.menuAction())
             self.menu_entries.remove(menu)
@@ -119,7 +135,7 @@ class GeomapfishLocatorPlugin(QObject):
     def unload(self):
         self.iface.invalidateLocatorResults()
         for menu_entry in self.menu_entries:
-            if type(menu_entry) == QAction:
+            if isinstance(menu_entry, QAction):
                 self.iface.removePluginMenu(self.plugin_name, menu_entry)
             else:
                 self.iface.removePluginMenu(self.plugin_name, menu_entry.menuAction())
@@ -132,11 +148,11 @@ class GeomapfishLocatorPlugin(QObject):
         services = []
         for locator_filter in self.locator_filters:
             services.append(locator_filter.service.as_dict())
-        self.settings.set_value('services', services)
+        self.settings.set_value("services", services)
 
     def refresh_menu(self):
         for menu_entry in self.menu_entries[1:]:
-            if type(menu_entry) == QAction:
+            if isinstance(menu_entry, QAction):
                 self.iface.removePluginMenu(self.plugin_name, menu_entry)
             else:
                 self.iface.removePluginMenu(self.plugin_name, menu_entry.menuAction())
