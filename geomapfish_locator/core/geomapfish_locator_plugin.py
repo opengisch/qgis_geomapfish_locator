@@ -49,7 +49,7 @@ class GeomapfishLocatorPlugin(QObject):
         menu_action_settings = QAction(QCoreApplication.translate('Geomapfish', 'Settings'), self.iface.mainWindow())
         menu_action_settings.triggered.connect(self.show_settings)
         self.iface.addPluginToMenu(self.plugin_name, menu_action_settings)
-        self.menu_actions = [menu_action_new, menu_action_settings]
+        self.menu_entries = [menu_action_new, menu_action_settings]
 
         for definition in self.settings.value('services'):
             self.add_service(Service(definition))
@@ -75,9 +75,9 @@ class GeomapfishLocatorPlugin(QObject):
         edit_action = menu.addAction(self.tr('edit'))
         edit_action.triggered.connect(lambda _: locator_filter.openConfigWidget())
         remove_action = menu.addAction(self.tr('remove'))
-        remove_action.triggered.connect(lambda _: GeomapfishLocatorPlugin.remove_service(self, locator_filter, menu.menuAction()))
+        remove_action.triggered.connect(lambda _: GeomapfishLocatorPlugin.remove_service(self, locator_filter, menu))
         self.iface.addPluginToMenu(self.plugin_name, menu.menuAction())
-        self.menu_actions.append(menu.menuAction())
+        self.menu_entries.append(menu)
 
     def new_service(self):
         service = Service()
@@ -110,17 +110,20 @@ class GeomapfishLocatorPlugin(QObject):
             self.tr('Are you sure to remove service "{}"'.format(locator_filter.service.name)),
             QMessageBox.Yes, QMessageBox.No)
         if reply == QMessageBox.Yes:
-            self.iface.removePluginMenu(self.plugin_name, menu)
-            self.menu_actions.remove(menu)
+            self.iface.removePluginMenu(self.plugin_name, menu.menuAction())
+            self.menu_entries.remove(menu)
             self.iface.deregisterLocatorFilter(locator_filter)
             self.locator_filters.remove(locator_filter)
             self.save_services()
 
     def unload(self):
         self.iface.invalidateLocatorResults()
-        for menu_action in self.menu_actions:
-            self.iface.removePluginMenu(self.plugin_name, menu_action)
-        del self.menu_actions[:]
+        for menu_entry in self.menu_entries:
+            if type(menu_entry) == QAction:
+                self.iface.removePluginMenu(self.plugin_name, menu_entry)
+            else:
+                self.iface.removePluginMenu(self.plugin_name, menu_entry.menuAction())
+        del self.menu_entries[:]
         for locator_filter in self.locator_filters:
             self.iface.deregisterLocatorFilter(locator_filter)
         self.locator_filters = {}
@@ -132,9 +135,12 @@ class GeomapfishLocatorPlugin(QObject):
         self.settings.set_value('services', services)
 
     def refresh_menu(self):
-        for menu_action in self.menu_actions[1:]:
-            self.iface.removePluginMenu(self.plugin_name, menu_action)
-        del self.menu_actions[1:]
+        for menu_entry in self.menu_entries[1:]:
+            if type(menu_entry) == QAction:
+                self.iface.removePluginMenu(self.plugin_name, menu_entry)
+            else:
+                self.iface.removePluginMenu(self.plugin_name, menu_entry.menuAction())
+        del self.menu_entries[1:]
         # use index based loop to avoid changing the variable used in the lambda !
         for i in range(len(self.locator_filters)):
             self.add_locator_menu_action(self.locator_filters[i])
