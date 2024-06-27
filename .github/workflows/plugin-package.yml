@@ -51,6 +51,7 @@ jobs:
         run: |
           VERSION=0.0.0
           qgis-plugin-ci package ${VERSION} \
+            --allow-uncommitted-changes \
             --transifex-token "${{ secrets.TX_TOKEN }}"
 
       - uses: actions/upload-artifact@v4
