@@ -1,3 +1,6 @@
 plugin_path: geomapfish_locator
 github_organization_slug: opengisch
 project_slug: qgis_geomapfish_locator
+
+transifex_coordinator: geoninja
+transifex_resource: geomapfish_locator
