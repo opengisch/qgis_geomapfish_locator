@@ -250,7 +250,7 @@ class GeomapfishLocatorFilter(QgsLocatorFilter):
                 color1,
                 color2,
                 nflash,
-                self.settings.value("highlight_duration") / nflash * 1000,
+                int(self.settings.value("highlight_duration") / nflash * 1000),
             )
         else:
             self.rubberband.reset(geometry.type())
