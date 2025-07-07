@@ -14,7 +14,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- """
+"""
 
 from qgis.core import QgsApplication, QgsAuthMethodConfig, QgsSettings
 from qgis.PyQt.QtCore import QCoreApplication
