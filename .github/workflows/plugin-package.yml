@@ -54,7 +54,7 @@ jobs:
             --asset-path geomapfish_locator/LICENSE \
             --transifex-token "${{ secrets.TX_TOKEN }}"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
         with:
           name: geomapfish_locator_dev
